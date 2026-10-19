@@ -1,0 +1,2133 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diseña lo que viene</title>
+<meta name="theme-color" content="#1f2449">
+<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="Diseña">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap">
+<style>
+/* Concepto: app móvil de la campaña "Diseña lo que viene" (Tinta Brava). Una sola estética de marca:
+   navy + rosa, Public Sans, líneas punteadas, trama de puntos y cuadrícula milimetrada del tríptico. */
+:root{
+  --navy:#1f2449; --rosa:#d66fa9; --amarillo:#fbce00; --verde:#93ab6a;
+  --papel:#ffffff; --gris:#f3f3f6; --error:#8a1f55; --errorbg:#fdf0f6; --ok:#4d6a2a;
+  --font:'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color-scheme: light;
+}
+html,body{height:100%}
+body{margin:0;background:var(--navy);font-family:var(--font);color:var(--navy);-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+button,input,select,textarea{font-family:inherit}
+button{cursor:pointer}
+button,a{transition:transform .12s ease,background-color .15s ease,color .15s ease,box-shadow .15s ease,border-color .15s;-webkit-tap-highlight-color:transparent}
+button:active:not(:disabled),a:active{transform:scale(.96)}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--amarillo);outline-offset:2px}
+button:disabled{opacity:.45;cursor:not-allowed}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* marco: celular a pantalla completa, teléfono centrado en compu */
+#root{height:100%;display:flex;justify-content:center;align-items:center}
+.stage{height:100%;width:100%;display:flex;justify-content:center;align-items:center;
+  background-color:var(--navy);background-image:radial-gradient(rgba(214,111,169,.35) 1px,transparent 1.5px);background-size:14px 14px}
+.app{position:relative;width:100%;max-width:440px;height:100%;background:var(--papel);overflow:hidden;display:flex;flex-direction:column}
+@media (min-width:600px) and (min-height:640px){
+  .app{height:min(880px,calc(100% - 40px));width:400px;border:10px solid #11142b;border-radius:38px;box-shadow:0 30px 80px rgba(0,0,0,.45)}
+}
+
+/* texturas del sistema */
+.halftone{background-color:var(--rosa);background-image:radial-gradient(rgba(31,36,73,.45) 1px,transparent 1.5px);background-size:4px 4px}
+.grid-rosa{background-image:linear-gradient(rgba(214,111,169,.22) 1px,transparent 1px),linear-gradient(90deg,rgba(214,111,169,.22) 1px,transparent 1px);background-size:14px 14px}
+.grid-navy{background-image:linear-gradient(rgba(31,36,73,.14) 1px,transparent 1px),linear-gradient(90deg,rgba(31,36,73,.14) 1px,transparent 1px);background-size:14px 14px}
+.asterisco{display:inline-block}
+
+/* estructura de pantalla */
+.screen{flex:1;min-height:0;display:flex;flex-direction:column;position:relative}
+.scroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.scroll::-webkit-scrollbar{display:none}
+.pad{padding:20px 22px}
+.stack{display:flex;flex-direction:column}
+.row{display:flex;align-items:center}
+.eyebrow{font-size:9px;letter-spacing:.06em;font-weight:500;display:flex;justify-content:space-between}
+.label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.h2{margin:0;font-size:14px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.muted{font-size:12px;line-height:1.45}
+h1{text-wrap:balance}
+
+/* cabeceras */
+.hdr{position:relative;background:var(--navy);color:var(--rosa);padding:16px 22px 18px;overflow:hidden;flex-shrink:0}
+.hdr h1{position:relative;margin:16px 0 0;font-size:30px;font-weight:800;line-height:.98}
+.hdr p{position:relative;margin:6px 0 0;font-size:12px;color:#fff}
+.hdr > *{position:relative}
+.hdr .deco{position:absolute}
+
+/* botones */
+.btn{min-height:48px;padding:0 18px;border:none;border-radius:0;font-size:13px;font-weight:800;letter-spacing:.07em;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-transform:uppercase}
+.btn-navy{background:var(--navy);color:var(--rosa)}
+.btn-navy:hover{box-shadow:5px 5px 0 var(--rosa)}
+.btn-rosa{background:var(--rosa);color:var(--navy)}
+.btn-rosa:hover{box-shadow:5px 5px 0 var(--amarillo)}
+.btn-ghost{background:transparent;color:var(--navy);border:1px dashed var(--navy)}
+.btn-ghost:hover{background:var(--gris)}
+.btn-ghost.on-dark{color:var(--rosa);border-color:var(--rosa)}
+.btn-ghost.on-dark:hover{background:rgba(214,111,169,.12)}
+.btn-link{background:transparent;border:none;padding:0 6px;min-height:36px;color:inherit;font-size:11px;font-weight:800;letter-spacing:.06em;text-decoration:underline;text-transform:uppercase}
+.btn-block{width:100%}
+.icon-btn{width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;background:transparent;border:1px dashed currentColor;color:inherit;flex-shrink:0;padding:0}
+.icon-btn.plain{border:none}
+.icon-btn.on{background:var(--amarillo);border:1px solid var(--navy);color:var(--navy)}
+
+/* chips */
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:0 22px}
+.chips::-webkit-scrollbar{display:none}
+.chips.wrap{flex-wrap:wrap;overflow:visible;padding:0}
+.chip{flex-shrink:0;min-height:38px;padding:0 13px;display:inline-flex;align-items:center;gap:6px;background:var(--papel);color:var(--navy);border:1px dashed var(--navy);font-size:12px;font-weight:600;letter-spacing:.03em}
+.chip:hover{background:var(--gris)}
+.chip.on{background:var(--navy);color:var(--rosa);border:1px solid var(--navy);font-weight:800}
+.chip.big{min-height:44px;font-size:13px}
+.filterbar{position:sticky;top:0;z-index:3;background:var(--papel);border-bottom:1px dashed var(--navy);padding:12px 0 10px;display:flex;flex-direction:column;gap:8px}
+.filterrow{display:flex;align-items:center;gap:8px}
+.filterrow .label{flex-shrink:0;width:64px;padding-left:22px;box-sizing:content-box;font-size:10px}
+.filterrow .chips{padding-left:0}
+.tag{display:inline-block;background:var(--navy);color:var(--rosa);font-size:10px;font-weight:800;letter-spacing:.06em;padding:3px 7px}
+
+/* formularios */
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.input{height:48px;width:100%;padding:0 12px;border:1px solid var(--navy);border-radius:0;background:var(--papel);color:var(--navy);font-size:16px}
+.input:focus{outline:3px solid var(--rosa);outline-offset:1px}
+.input.err{border:2px solid var(--error);background:var(--errorbg)}
+.input.dark{background:transparent;color:#fff;border:1px dashed var(--rosa)}
+.input.dark::placeholder{color:rgba(255,255,255,.65)}
+.pass{position:relative}
+.pass .input{padding-right:52px}
+.pass .icon-btn{position:absolute;right:2px;top:2px;border:none;color:var(--navy)}
+.msg{display:flex;gap:6px;align-items:flex-start;font-size:12px;font-weight:600;line-height:1.35}
+.msg.err{color:var(--error)}
+.msg.ok{color:var(--ok)}
+.hint{font-size:11px;line-height:1.35}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.alert{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;font-size:13px;line-height:1.45}
+.alert.err{background:var(--errorbg);border:2px solid var(--error);color:var(--error)}
+.alert.info{background:var(--amarillo);color:var(--navy)}
+
+/* barra de pestañas */
+.tabbar{flex-shrink:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));background:var(--navy);border-top:1px dashed var(--rosa);padding-bottom:env(safe-area-inset-bottom,0px);z-index:5}
+.tab{min-height:68px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;background:transparent;border:none;border-top:3px solid transparent;color:#fff;font-size:10px;font-weight:600;letter-spacing:.08em}
+.tab.on{color:var(--rosa);font-weight:800;border-top-color:var(--rosa)}
+.tab .badge{position:absolute;margin-left:22px;margin-top:-26px;background:var(--amarillo);color:var(--navy);font-size:9px;font-weight:900;min-width:16px;height:16px;padding:0 4px;display:flex;align-items:center;justify-content:center}
+.tab{position:relative}
+
+/* tarjetas */
+.card{display:flex;flex-direction:column;border:1px solid var(--navy);background:var(--papel);color:var(--navy);text-align:left;padding:0;width:100%}
+button.card:hover{box-shadow:6px 6px 0 var(--rosa)}
+.duo{position:relative;overflow:hidden;isolation:isolate}
+.duo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.2);mix-blend-mode:multiply}
+.duo::after{content:"";position:absolute;inset:0;background:var(--navy);mix-blend-mode:lighten;pointer-events:none}
+.duo > .over{position:relative;z-index:1}
+.dashed-top{border-top:1px dashed var(--navy)}
+.dashed-bottom{border-bottom:1px dashed var(--navy)}
+
+/* feed */
+.post-tile{position:relative;height:196px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-top:1px dashed var(--navy);border-bottom:1px dashed var(--navy)}
+.post-tile .mark{position:relative;font-size:64px;font-weight:900;line-height:.9;letter-spacing:-.02em}
+.post-tile .cap{position:absolute;left:12px;bottom:10px;font-size:10px;font-weight:600;letter-spacing:.06em}
+.matlink{display:flex;justify-content:space-between;align-items:center;min-height:48px;padding:0 12px;border:1px dashed var(--navy);background:var(--papel);color:var(--navy);text-align:left;width:100%}
+.matlink:hover{background:var(--errorbg);border-style:solid}
+.act{height:44px;padding:0 10px;background:transparent;border:none;display:inline-flex;align-items:center;gap:6px;color:var(--navy);font-size:12px;font-weight:600}
+.act:hover{background:var(--gris)}
+.act.liked{color:#b0306f;font-weight:800}
+.act.saved{font-weight:800}
+.avatar{border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--rosa)}
+.avatar-ini{border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--navy);border:2px solid var(--rosa)}
+
+/* detalle facultad */
+.tabs4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:0 14px;border-bottom:1px solid var(--navy);background:var(--papel);position:sticky;top:0;z-index:3}
+.tabs4 button{min-height:50px;background:transparent;border:none;border-bottom:4px solid transparent;color:var(--navy);font-size:11px;font-weight:500;letter-spacing:.06em;padding:0}
+.tabs4 button.on{font-weight:800;border-bottom-color:var(--rosa)}
+.kv3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-bottom:1px dashed var(--navy)}
+.kv3 > div{padding:10px;display:flex;flex-direction:column;gap:2px}
+.kv3 > div + div{border-left:1px dashed var(--navy)}
+.vert{writing-mode:vertical-rl;transform:rotate(180deg);font-weight:800;font-size:14px;letter-spacing:.08em}
+.mat{font-size:11px;line-height:1.25;padding:5px 8px;background:var(--gris);font-weight:600}
+.mat.main{background:var(--rosa);font-weight:800}
+.mat.extra{background:transparent;border:1px dashed var(--navy);font-style:italic;font-weight:500}
+
+/* capas */
+.toast{position:absolute;left:14px;right:14px;z-index:40;background:var(--navy);color:#fff;border:1px dashed var(--rosa);padding:10px 8px 10px 14px;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;box-shadow:0 10px 26px rgba(31,36,73,.3);animation:up .25s ease}
+.toast.err{background:var(--amarillo);color:var(--navy);border:2px solid var(--navy)}
+.toast .undo{min-height:36px;padding:0 8px;background:transparent;border:none;color:var(--amarillo);font-size:12px;font-weight:800;letter-spacing:.06em;text-decoration:underline}
+.toast.err .undo{color:var(--navy)}
+@keyframes up{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
+.veil{position:absolute;inset:0;z-index:50;background:rgba(31,36,73,.72);display:flex;align-items:flex-end;animation:fade .2s ease}
+.sheet{width:100%;background:var(--papel);border-top:4px solid var(--rosa);padding:20px 22px calc(24px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px;animation:up .28s ease;max-height:92%;overflow-y:auto}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.fade-in{animation:fadein .22s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.savebar{position:absolute;left:0;right:0;bottom:0;z-index:30;background:var(--papel);border-top:2px solid var(--navy);padding:10px 14px;display:flex;align-items:center;gap:10px;animation:up .2s ease}
+.steps{display:flex;gap:6px}
+.steps span{flex:1;height:6px;border:1px dashed var(--rosa)}
+.steps span.done{background:var(--rosa);border-style:solid}
+.progress{height:8px;border:1px dashed var(--rosa)}
+.progress > div{height:100%;background:var(--rosa);transition:width .3s ease}
+.empty{border:1px dashed var(--navy);padding:24px 20px;text-align:center;font-size:13px;line-height:1.5;display:flex;flex-direction:column;align-items:center;gap:12px}
+.seg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--navy)}
+.seg button{min-height:44px;background:var(--papel);border:none;color:var(--navy);font-size:11px;font-weight:600;letter-spacing:.03em;padding:0 2px}
+.seg button + button{border-left:1px dashed var(--navy)}
+.seg button.on{background:var(--navy);color:var(--rosa);font-weight:800}
+.list-item{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--navy);background:var(--papel);color:var(--navy);text-align:left;width:100%}
+.list-item:hover{box-shadow:5px 5px 0 var(--rosa)}
+.menu-item{display:flex;align-items:center;gap:12px;min-height:56px;padding:0 4px;background:transparent;border:none;border-bottom:1px dashed var(--navy);color:var(--navy);font-size:14px;font-weight:700;width:100%;text-align:left}
+.menu-item:hover{background:var(--gris)}
+.fab{position:absolute;right:16px;bottom:16px;z-index:20;min-height:52px;padding:0 18px 0 14px;display:flex;align-items:center;gap:8px;background:var(--rosa);color:var(--navy);border:2px solid var(--navy);font-size:12px;font-weight:900;letter-spacing:.07em;box-shadow:4px 4px 0 var(--navy)}
+.fab:hover{background:var(--amarillo)}
+.opt{display:flex;align-items:center;gap:12px;width:100%;min-height:64px;padding:12px 14px;background:var(--papel);color:var(--navy);border:1px dashed var(--navy);text-align:left}
+.opt:hover{background:var(--gris)}
+.opt .dot{width:20px;height:20px;border-radius:50%;border:2px solid var(--navy);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.opt.on{border:2px solid var(--navy);background:var(--errorbg)}
+.opt.on .dot::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--rosa)}
+.opt.err{border-color:var(--error)}
+.carousel{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;width:100%;height:250px}
+.carousel::-webkit-scrollbar{display:none}
+.carousel .slide{flex:0 0 100%;height:100%;scroll-snap-align:start;border:none;padding:0;background:#11142b}
+.carousel .slide:active{transform:none}
+.carousel img{width:100%;height:100%;object-fit:cover;display:block}
+.post-tile .count{position:absolute;right:10px;bottom:10px;background:var(--navy);color:var(--rosa);font-size:10px;font-weight:800;letter-spacing:.06em;padding:4px 8px;pointer-events:none}
+.thumbs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.thumbs.err{outline:2px solid var(--error);outline-offset:4px}
+.thumb{position:relative;aspect-ratio:1;max-width:100%;overflow:hidden;background:var(--gris);border:1px solid var(--navy)}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb .rm{position:absolute;top:4px;right:4px;width:28px;height:28px;border-radius:50%;border:none;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;padding:0}
+.thumb .portada,.thumb .mkcover{position:absolute;left:4px;bottom:4px;font-size:9px;font-weight:800;letter-spacing:.05em;padding:3px 5px}
+.thumb .portada{background:var(--rosa);color:var(--navy)}
+.thumb .mkcover{background:rgba(255,255,255,.92);color:var(--navy);border:1px dashed var(--navy);min-height:24px}
+.thumb.add{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border:1px dashed var(--navy);background:var(--papel);cursor:pointer;font-size:11px;font-weight:700;text-align:center;transition:background-color .15s}
+.thumb.add:hover{background:var(--errorbg)}
+.thumb.add:focus-within{outline:3px solid var(--amarillo);outline-offset:2px}
+.thumb.loading{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;animation:pulse 1s ease-in-out infinite alternate}
+@keyframes pulse{from{opacity:.5}to{opacity:1}}
+.input.area{height:auto;min-height:110px;padding:10px 12px;line-height:1.45;resize:vertical;font-size:15px}
+.mini{display:flex;flex-direction:column;border:1px solid var(--navy);background:var(--papel);color:var(--navy);padding:0;text-align:left;overflow:hidden}
+.mini img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+.mini:hover{box-shadow:5px 5px 0 var(--rosa)}
+.mat.link{border:none;color:var(--navy);text-decoration:none;display:inline-flex;align-items:center;gap:4px;cursor:pointer;text-align:left;font-family:inherit}
+.mat.link:hover{outline:1px solid var(--navy)}
+.mat.link .hora{display:inline-flex}
+.cat-row{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;background:var(--papel);color:var(--navy);border:1px dashed var(--navy);text-align:left}
+.cat-row:hover{background:var(--gris)}
+.cat-row .dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--navy);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.cat-row.on{border:2px solid var(--navy);background:var(--errorbg)}
+.cat-row.on .dot::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--rosa)}
+.slot{font-size:11px;font-weight:700;padding:3px 7px;border:1px solid var(--navy)}
+.slot.tM{background:var(--amarillo)}
+.slot.tT{background:var(--rosa)}
+.slot.tN{background:var(--navy);color:var(--papel)}
+.slot.tX{background:var(--gris);font-style:italic}
+.seg.dark{border-color:var(--rosa);grid-template-columns:repeat(4,minmax(0,1fr))}
+.seg.dark button{background:transparent;color:#fff;display:flex;align-items:center;justify-content:center;gap:5px}
+.seg.dark button + button{border-left:1px dashed var(--rosa)}
+.seg.dark button.on{background:var(--rosa);color:var(--navy)}
+.car-chip{background:transparent;color:#fff;border-color:var(--rosa)}
+.car-chip:hover{background:rgba(214,111,169,.15)}
+.car-chip.on{background:var(--rosa);color:var(--navy);border:1px solid var(--rosa)}
+.tdot{display:inline-block;width:9px;height:9px;border-radius:50%;flex-shrink:0;border:1px solid var(--navy)}
+.tdot.tM{background:var(--amarillo)}.tdot.tT{background:var(--rosa)}.tdot.tN{background:var(--navy);border-color:#fff}.tdot.tX{background:var(--gris)}
+.cat-chip .tdot.tN{border-color:var(--navy)}
+.year{padding:0 22px;border-top:1px dashed var(--navy)}
+.year:last-of-type{border-bottom:1px dashed var(--navy)}
+.year.open{background:#faf9fc;padding-bottom:18px}
+.year-head{display:flex;align-items:center;gap:14px;width:100%;min-height:76px;padding:12px 0;background:transparent;border:none;color:var(--navy)}
+.year-head:active{transform:none}
+.year-head:hover{background:rgba(31,36,73,.03)}
+.year .chev{transition:transform .2s ease;display:flex}
+.year.open .chev{transform:rotate(180deg)}
+.year-num{font-size:52px;font-weight:900;line-height:.8;color:var(--rosa);min-width:34px;-webkit-text-stroke:1px var(--navy)}
+.mat-card{border:1px solid var(--navy);background:var(--papel)}
+.mat-card.libre{border-style:dashed;background:var(--gris)}
+.mat-head{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:12px 12px 10px;background:transparent;border:none;color:var(--navy);text-align:left}
+button.mat-head:hover{background:var(--gris)}
+button.mat-head:active{transform:none}
+.mat-name{font-size:14px;font-weight:800;line-height:1.2}
+.mat-meta{font-size:11px;font-weight:600}
+.mat-go{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;flex-shrink:0}
+.cat-chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 12px 12px}
+.cat-chip{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 10px;background:var(--papel);color:var(--navy);border:1px solid var(--navy);font-size:12px;font-weight:700}
+.cat-chip:hover{background:var(--gris)}
+.cat-chip.pend{border-style:dashed;font-weight:600}
+.cat-chip .dots{display:inline-flex;gap:2px}
+.cat-chip .cat-g{font-size:9px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;background:var(--gris);padding:2px 4px}
+
+.cat-sheet{padding-top:0;gap:18px}
+.cat-sheet-top{position:relative;margin:0 -22px;padding:14px 22px 18px;background:var(--navy);overflow:hidden}
+.slot-row{display:flex;align-items:center;gap:14px;padding:12px 14px;border:1px solid var(--navy)}
+.slot-row .slot-dia{font-size:16px;font-weight:900;text-transform:uppercase;letter-spacing:.03em;min-width:92px}
+.slot-row.tM{background:var(--amarillo)}.slot-row.tT{background:var(--rosa)}.slot-row.tN{background:var(--navy);color:#fff}.slot-row.tX{background:var(--gris)}
+.help-pill{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 12px;background:transparent;color:var(--rosa);border:1px dashed var(--rosa);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.help-pill:hover{background:rgba(214,111,169,.12)}
+.login-foot{margin-top:auto;padding-top:14px;border-top:1px dashed rgba(214,111,169,.7);display:grid;grid-template-columns:1fr 1fr;gap:16px;font-size:9px;line-height:1.55;letter-spacing:.07em;text-transform:uppercase;font-weight:500}
+.login-foot strong{font-weight:800}
+.icon-btn.bm:hover{background:rgba(31,36,73,.08)}
+.fbar{position:sticky;top:0;z-index:3;background:var(--papel);border-bottom:1px dashed var(--navy);padding:10px 22px;display:flex;align-items:center;gap:10px}
+.fbtn{flex-shrink:0;min-height:40px;padding:0 12px;display:inline-flex;align-items:center;gap:7px;background:var(--papel);color:var(--navy);border:1px solid var(--navy);font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase}
+.fbtn:hover{background:var(--gris)}
+.fbtn.on{background:var(--navy);color:var(--rosa)}
+.fcount{min-width:18px;height:18px;padding:0 4px;display:inline-flex;align-items:center;justify-content:center;background:var(--rosa);color:var(--navy);font-size:10px;font-weight:900}
+.fpills{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;min-width:0;flex:1}
+.fpills::-webkit-scrollbar{display:none}
+.fpill{flex-shrink:0;min-height:32px;padding:0 10px;display:inline-flex;align-items:center;gap:6px;background:var(--errorbg);color:var(--navy);border:1px solid var(--navy);font-size:11px;font-weight:700}
+.fpill:hover{background:var(--rosa)}
+.fbar.flat{position:static;border-top:none}
+.fhint{font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--navy);opacity:.75}
+.hor{padding:14px 22px 12px;display:flex;flex-direction:column;gap:10px;border-bottom:1px dashed var(--navy)}
+.mini-seg{display:flex;border:1px solid var(--navy)}
+.mini-seg button{min-height:32px;padding:0 8px;display:inline-flex;align-items:center;gap:4px;background:var(--papel);border:none;color:var(--navy);font-size:10px;font-weight:700;letter-spacing:.03em}
+.mini-seg button + button{border-left:1px dashed var(--navy)}
+.mini-seg button.on{background:var(--navy);color:var(--rosa)}
+.cat-strip{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 -22px;padding:0 22px 2px}
+.cat-strip::-webkit-scrollbar{display:none}
+.cat-strip .cat-chip{flex-shrink:0}
+.cat-chip.on,.cat-chip.on:hover{background:var(--navy);color:var(--rosa)}
+.cat-chip.on .tdot.tN{border-color:var(--rosa)}
+.sel-info{border:2px solid var(--navy);background:var(--errorbg);padding:10px 8px 10px 12px;display:flex;flex-direction:column;gap:8px}
+.tabs2{position:sticky;top:0;z-index:3;display:grid;grid-template-columns:1fr 1fr;background:var(--papel);border-bottom:1px solid var(--navy);padding:0 22px}
+.tabs2 button{min-height:48px;background:transparent;border:none;border-bottom:4px solid transparent;color:var(--navy);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.tabs2 button.on{font-weight:900;border-bottom-color:var(--rosa)}
+.p-hdr{padding:16px 22px 16px}
+.p-prog{margin-top:14px;width:100%;display:flex;flex-direction:column;gap:6px;padding:8px 10px;background:rgba(214,111,169,.1);border:1px dashed var(--rosa);color:#fff;font-size:11px;font-weight:700;text-align:left}
+.p-prog:hover{background:rgba(214,111,169,.2)}
+.p-sec{padding:16px 22px 14px;display:flex;flex-direction:column;gap:10px;border-top:1px dashed var(--navy)}
+.p-sec:first-of-type{border-top:none}
+.p-empty{display:flex;align-items:center;gap:12px;width:100%;padding:10px 12px;background:var(--gris);border:1px dashed var(--navy);color:var(--navy);font-size:12px;font-weight:600;line-height:1.35}
+.p-empty:hover{background:var(--errorbg)}
+.p-none{margin:0;font-size:12px;line-height:1.4}
+.mini-strip{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -22px;padding:0 22px}
+.mini-strip::-webkit-scrollbar{display:none}
+.mini-strip .mini{flex:0 0 132px}
+.seg-sm button{min-height:38px;font-size:11px}
+.list-item.sm{padding:8px 10px;gap:10px}
+.set-list{display:flex;flex-direction:column;border:1px solid var(--navy)}
+.set-row{display:flex;align-items:center;gap:12px;width:100%;min-height:54px;padding:6px 12px;background:var(--papel);border:none;color:var(--navy);text-align:left}
+.set-row + .set-row{border-top:1px dashed var(--navy)}
+.set-row:hover{background:var(--gris)}
+.set-row:active{transform:none;background:var(--errorbg)}
+.set-ic{width:32px;height:32px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--navy);color:var(--rosa)}
+.set-t{font-size:14px;font-weight:800}
+.set-d{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.set-d.warn{color:var(--error);font-weight:700}
+.sheet-t{font-size:18px;font-weight:900;text-transform:uppercase}
+.clamp2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.avatar-edit{position:relative;display:inline-flex;flex-shrink:0;cursor:pointer;border-radius:50%;transition:transform .12s ease}
+.avatar-edit:active{transform:scale(.95)}
+.avatar-edit:hover .cam{background:var(--amarillo)}
+.avatar-edit:focus-within{outline:3px solid var(--amarillo);outline-offset:3px}
+.avatar-edit .cam{position:absolute;right:-2px;bottom:-2px;width:30px;height:30px;border-radius:50%;background:var(--rosa);color:var(--navy);border:2px solid var(--navy);display:flex;align-items:center;justify-content:center;transition:background-color .15s}
+</style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/htm@3.1.1/dist/htm.umd.js"></script>
+<script>
+(function () {
+'use strict';
+var h = React.createElement, useState = React.useState, useEffect = React.useEffect, useRef = React.useRef;
+var html = htm.bind(h);
+
+/* ---------- almacenamiento seguro ---------- */
+var mem = {};
+var store = {
+  get: function (k, d) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return mem[k] !== undefined ? mem[k] : d; } },
+  set: function (k, v) { mem[k] = v; try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+
+/* ---------- íconos ---------- */
+function I(name, size, extra) {
+  size = size || 20; extra = extra || {};
+  var sw = extra.sw || 2, fill = extra.fill || 'none', col = extra.color || 'currentColor';
+  var p = {
+    home: html`<path d="M3 11 L12 3 L21 11 V21 H3 Z"/><path d="M9 21 V14 H15 V21"/>`,
+    fac: html`<path d="M2 9 L12 3 L22 9"/><path d="M4 9 V19 M9 9 V19 M15 9 V19 M20 9 V19"/><path d="M2 21 H22"/>`,
+    user: html`<circle cx="12" cy="8" r="4"/><path d="M4 21 C4 16 8 14 12 14 C16 14 20 16 20 21"/>`,
+    search: html`<circle cx="10" cy="10" r="7"/><path d="M15 15 L22 22"/>`,
+    x: html`<path d="M5 5 L19 19 M19 5 L5 19"/>`,
+    back: html`<path d="M20 12 H4 M10 5 L3 12 L10 19"/>`,
+    arrow: html`<path d="M5 19 L19 5 M8 5 H19 V16"/>`,
+    check: html`<path d="M4 12 L10 18 L20 6"/>`,
+    alert: html`<circle cx="12" cy="12" r="10"/><path d="M12 7v6M12 16.5v.5"/>`,
+    info: html`<circle cx="12" cy="12" r="10"/><path d="M12 11v6M12 7.5v.5"/>`,
+    help: html`<circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14"/><path d="M12 17.5v.5"/>`,
+    heart: html`<path d="M12 20 C5 15 3 12 3 8.5 C3 6 5 4 7.5 4 C9.5 4 11 5 12 7 C13 5 14.5 4 16.5 4 C19 4 21 6 21 8.5 C21 12 19 15 12 20 Z"/>`,
+    bookmark: html`<path d="M6 3 H18 V21 L12 16 L6 21 Z"/>`,
+    eye: html`<path d="M2 12 C5 6 9 4 12 4 C15 4 19 6 22 12 C19 18 15 20 12 20 C9 20 5 18 2 12 Z"/><circle cx="12" cy="12" r="3"/>`,
+    eyeoff: html`<path d="M3 3 L21 21"/><path d="M10.6 5.1 A10 10 0 0 1 12 5 C15 5 19 7 22 12 A17 17 0 0 1 19 15.8 M6.4 6.5 C4.7 7.7 3.2 9.5 2 12 C5 18 9 20 12 20 C13.7 20 15.3 19.5 16.8 18.6"/><path d="M9.9 9.9 A3 3 0 0 0 14.1 14.1"/>`,
+    expand: html`<path d="M14 4 H20 V10 M20 4 L13 11 M10 20 H4 V14 M4 20 L11 13"/>`,
+    logout: html`<path d="M15 4 H20 V20 H15"/><path d="M10 8 L6 12 L10 16 M6 12 H16"/>`,
+    bulb: html`<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3Z"/>`,
+    star: html`<path d="M12 2 V22 M2 12 H22 M5 5 L19 19 M19 5 L5 19"/>`,
+    clock: html`<circle cx="12" cy="12" r="9"/><path d="M12 7 V12 L15 14"/>`,
+    sliders: html`<path d="M4 7 H14 M18 7 H20 M4 17 H8 M12 17 H20"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/>`,
+    chev: html`<path d="M6 9 L12 15 L18 9"/>`,
+    plus: html`<path d="M12 4 V20 M4 12 H20"/>`,
+    trash: html`<path d="M4 7 H20 M9 7 V4 H15 V7 M6 7 L7 21 H17 L18 7"/><path d="M10 11 V17 M14 11 V17"/>`,
+    image: html`<path d="M3 4 H21 V20 H3 Z"/><path d="M3 16 L9 11 L14 15 L17 12 L21 15"/><circle cx="16" cy="8" r="1.6"/>`,
+    chevr: html`<path d="M9 6 L15 12 L9 18"/>`,
+    camera: html`<path d="M3 7 H7 L9 4 H15 L17 7 H21 V20 H3 Z"/><circle cx="12" cy="13" r="4"/>`
+  }[name];
+  return html`<svg aria-hidden="true" width=${size} height=${size} viewBox="0 0 24 24" fill=${fill} stroke=${col} stroke-width=${sw} stroke-linecap="square">${p}</svg>`;
+}
+function Asterisco(size, color, sw) { return html`<svg aria-hidden="true" width=${size} height=${size} viewBox="0 0 40 40" stroke=${color || '#d66fa9'} stroke-width=${sw || 3}><path d="M20 2 V38 M2 20 H38 M7 7 L33 33 M33 7 L7 33"/></svg>`; }
+
+/* ---------- datos ---------- */
+var PROVS = [
+  { id: 'ba', nombre: 'Buenos Aires', facs: ['fadu', 'unlp', 'unmdp'] },
+  { id: 'caba', nombre: 'Ciudad de Buenos Aires', facs: ['fadu', 'unlp'] },
+  { id: 'cba', nombre: 'Córdoba', facs: ['unc'] },
+  { id: 'sf', nombre: 'Santa Fe', facs: ['unl', 'unr'] },
+  { id: 'mza', nombre: 'Mendoza', facs: ['uncuyo'] }
+];
+function provById(id) { return PROVS.filter(function (p) { return p.id === id; })[0] || PROVS[0]; }
+var ANIOS = ['4° año', '5° año', '6° año'];
+var ANIOS_CAR = ['Ingreso / CBC', '1° año', '2° año', '3° año', '4° año', '5° año', '6° año'];
+var CATEDRAS = ['Cátedra 1', 'Cátedra 2', 'Cátedra 3'];
+function carreraDe(facId, sigla) { var f = facById(facId); return f ? f.carreras.filter(function (x) { return x.sigla === sigla; })[0] : null; }
+function materiasDe(facId, sigla) {
+  var x = carreraDe(facId, sigla); if (!x) return [];
+  if (!x.plan) return [x.taller, x.taller.replace(/ I$| 1$/, function (m) { return m === ' I' ? ' II' : ' 2'; })].filter(function (v, i, a) { return a.indexOf(v) === i; });
+  var out = [];
+  x.plan.forEach(function (y) { if (/CBC/.test(y[0] + y[1])) return; y[2].forEach(function (m) { if (m.charAt(0) === '+' || m.charAt(0) === '@') return; var n = m.replace(/^\*/, '').replace('¹', ''); if (out.indexOf(n) < 0) out.push(n); }); });
+  return out;
+}
+function etapaTxt(u) {
+  if (u.nivel === 'facultad') { var f = facById(u.facu), x = carreraDe(u.facu, u.carrera); return [x ? x.nombre : 'Facultad', f ? f.sigla : '', u.anioCar].filter(Boolean).join(' · '); }
+  return (u.anio || '') + ' de la secundaria';
+}
+var INTERESES = [['ARQ', 'Arquitectura'], ['DG', 'Diseño Gráfico'], ['DI', 'Diseño Industrial'], ['UX', 'UX/UI'], ['IND', 'Indumentaria'], ['TEX', 'Textil'], ['DIS', 'Imagen y Sonido']];
+
+var CBC_BASE = ['Intr. al Conocimiento de la Sociedad y el Estado', 'Intr. al Pensamiento Científico', 'Intr. al Conocimiento Proyectual I', 'Intr. al Conocimiento Proyectual II', 'Matemática', 'Taller de Dibujo'];
+var CBC = { A: CBC_BASE.concat(['Filosofía']), D: CBC_BASE.concat(['Semiología']) };
+var X = '[A completar]';
+
+var B = {
+  progresar: { tipo: 'NACIÓN', nombre: 'Becas Progresar', desc: 'Programa nacional de becas para estudios superiores. Se inscribe en la convocatoria anual.' },
+  manifiesto: { tipo: 'CAMPAÑA', nombre: 'Beca Manifiesto Juvenil', desc: 'Estipendio económico mensual para manutención + tutoría académica de nivelación durante el primer año.' },
+  codigo: { tipo: 'CAMPAÑA', nombre: 'Beca Código Visual', desc: 'Beca para carreras o tecnicaturas de diseño digital + licencias de software profesional + mentoría 1 a 1.' },
+  materiaViva: { tipo: 'CAMPAÑA', nombre: 'Beca Materia Viva Buenos Aires', desc: 'Financiamiento total de la carrera + acceso a FabLabs y laboratorios de prototipado 3D + asignación para materiales.' },
+  proyectar: { tipo: 'CAMPAÑA', nombre: 'Beca Proyectar Córdoba', desc: '100% de la matrícula en Arquitectura + pasantía garantizada en EDISUR.' }
+};
+function uniBeca(u) { return { tipo: u, nombre: 'Becas de la ' + u, desc: 'Ayudas económicas propias de la universidad. Requisitos y fechas en su sitio oficial.' }; }
+
+var FACS = [
+  { id: 'fadu', sigla: 'FADU', nombre: 'Facultad de Arquitectura, Diseño y Urbanismo', uni: 'UBA', ciudad: 'CABA', sede: 'Ciudad Universitaria, Pabellón III · CABA', img: 'img/fadu2.jpg', color: '#d66fa9', ingreso: 'CBC', web: 'fadu.uba.ar',
+    ingresoInfo: 'Es el Ciclo Básico Común: el primer año de todas las carreras de la UBA. Son 7 materias y se puede cursar en sedes de todo el AMBA o a distancia (UBA XXI).',
+    becas: [{ tipo: 'UBA', nombre: 'Becas Sarmiento', desc: 'Ayuda económica de la UBA para estudiantes de grado. Requisitos y fechas en el sitio de la universidad.' }, B.progresar, B.materiaViva, B.codigo],
+    carreras: [
+      { sigla: 'ARQ', k: 'arq', nombre: 'Arquitectura', dur: 'CBC + 5 niveles', taller: 'Arquitectura I', plan: [
+        ['CBC', 'Ciclo Básico Común', ['@A']],
+        ['Nivel 1', '', ['*Arquitectura I', 'Matemática II', 'Sistemas de Representación Geométrica', 'Física Aplicada a la Arquitectura', 'Introducción a la Arquitectura Contemporánea', 'Introducción a los Tipos Constructivos', 'Introducción a los Tipos Estructurales']],
+        ['Nivel 2', '', ['*Arquitectura II', 'Estructuras I', 'Historia I', 'Construcciones I', 'Instalaciones I', 'Morfología I', 'Representación Arquitectónica']],
+        ['Nivel 3', '', ['*Arquitectura III', 'Estructuras II', 'Historia II', 'Construcciones II', 'Instalaciones II', 'Morfología II', 'Materialización de Proyectos']],
+        ['Nivel 4', '', ['*Arquitectura IV', 'Estructuras III', 'Planificación Urbana', 'Construcciones III', 'Instalaciones III', 'Historia III', 'Teoría de la Arquitectura', 'Prácticas Profesionales Asistidas', '+Optativas']],
+        ['Nivel 5', '', ['*Proyecto Arquitectónico', '*Proyecto Urbano', 'Dirección y Legislación de Obra', '+Prácticas Profesionales Asistidas', '+Optativas']]] },
+      { sigla: 'DG', k: 'dg', nombre: 'Diseño Gráfico', dur: '5 años (CBC + 4)', taller: 'Diseño Gráfico I', plan: [
+        ['1° año', 'CBC', ['@D']],
+        ['2° año', 'Formación Inicial', ['*Diseño Gráfico I', 'Morfología I', 'Tipografía I', 'Comunicación I', 'Historia I', 'Tecnología I', 'Electiva I']],
+        ['3° año', 'Formación General · ¹ o en 4°', ['*Diseño Gráfico II', 'Morfología II¹', 'Tipografía II¹', 'Comunicación II', 'Historia II', 'Medios Expresivos I', 'Tecnología II']],
+        ['4° año', 'Formación General', ['*Diseño Gráfico III', 'Legislación y Práctica Profesional', 'Electiva Socio-Humanística', 'Medios Expresivos II']],
+        ['5° año', 'Formación Orientada', ['*Diseño Gráfico IV', 'Electiva Orientada I', 'Electiva Orientada II', '+Optativas I y II', '+Seminarios optativos I, II y III']]] },
+      { sigla: 'DI', k: 'di', nombre: 'Diseño Industrial', dur: '6 años (CBC + 5) · plan nuevo', taller: 'Taller de Diseño Industrial I', plan: [
+        ['1° año', 'CBC', ['@D']],
+        ['2° año', '600 hs', ['*Taller de Diseño Industrial I', 'Morfología I', 'Tecnología I', 'Física I', 'Matemática I', 'Análisis de Productos']],
+        ['3° año', '600 hs', ['*Taller de Diseño Industrial II', 'Morfología II', 'Tecnología II', 'Ergonomía y Factores Humanos', 'Historia del DI 1']],
+        ['4° año', '600 hs', ['*Taller de Diseño Industrial III', 'Morfología III', 'Tecnología III', 'Física II', 'Historia del DI 2']],
+        ['5° año', '480 hs', ['*Taller de Diseño Industrial IV', 'Tecnología IV', 'Sociología aplicada al Diseño', 'Gestión Industrial', '+Optativas y electivas']],
+        ['6° año', '420 hs', ['*Proyecto Final', 'Metodología de la Investigación en Diseño', 'Legislación y Práctica Profesional', 'Gestión de Proyecto', 'Práctica Profesional', '+Optativas y electivas']]] },
+      { sigla: 'DIS', k: 'otras', nombre: 'Diseño de Imagen y Sonido', dur: 'CBC + 4 niveles', taller: 'Proyecto Audiovisual 1', plan: [
+        ['CBC', 'Ciclo Básico Común', ['@D']],
+        ['Nivel 1', '600 hs', ['*Proyecto Audiovisual 1', 'Sonido 1', 'Montaje 1', 'Narrativas Audiovisuales', 'Escrituras Audiovisuales 1', 'Dibujo y Representación Audiovisual', 'Iluminación y Cámara 1', 'Estética', 'Sociología']],
+        ['Nivel 2', '600 hs', ['*Proyecto Audiovisual 2', 'Sonido 2', 'Escrituras Audiovisuales 2', 'Producción y Planificación', 'Técnicas Audiovisuales', 'Iluminación y Cámara 2', 'Historia Analítica de los Medios AV 1', 'Teorías Audiovisuales']],
+        ['Nivel 3', '600 hs', ['*Proyecto Audiovisual 3', 'Montaje 2', 'Difusión y Comercialización de los Medios', 'Historia Analítica de los Medios AV 2', 'Teoría y Estética de los Medios', '+Electivas', '+Optativas']],
+        ['Nivel 4', '420 hs', ['*Proyecto Audiovisual 4', '+Electivas', '+Optativas']]] },
+      { sigla: 'DIN', k: 'otras', nombre: 'Diseño de Indumentaria', dur: '5 años (CBC + 4)', taller: 'Proyecto de Indumentaria I', plan: [
+        ['1° año', 'CBC', ['@D']],
+        ['2° año', '525 hs', ['*Medios Expresivos I', 'Fundamentos Geométricos del Modelaje', 'Introducción al Proyecto', 'Historia del Diseño de Indumentaria y Textil I', 'Análisis del Diseño de Indumentaria y Textil I', 'Técnicas de Producción e Industria Nacional I', 'Técnicas de Producción e Industria Nacional II']],
+        ['3° año', '600 hs', ['*Proyecto de Indumentaria I', 'Medios Expresivos II', 'Materialización de Proyecto', 'Técnicas de Producción de Indumentaria I', 'Técnicas de Producción de Indumentaria II', 'Historia del Diseño de Indumentaria y Textil II', 'Análisis del Diseño de Indumentaria y Textil II']],
+        ['4° año', '495 hs', ['*Proyecto de Indumentaria II', '*Proyecto de Indumentaria III', 'Proyecto de Accesorios I', 'Comunicación y Crítica', 'Sociología', 'Comercialización y Mercado I', 'Comercialización y Mercado II', 'Técnicas de Producción de Indumentaria III', 'Técnicas de Producción de Indumentaria IV']],
+        ['5° año', '405 hs', ['*Proyecto de Indumentaria IV', '*Trabajo Final de Carrera', 'Proyecto de Accesorios II', 'Ética Profesional', 'Práctica Profesional Asistida', '+Optativas I y II']]] },
+      { sigla: 'DTX', k: 'otras', nombre: 'Diseño Textil', dur: '5 años (CBC + 4)', taller: 'Proyecto Textil I', plan: [
+        ['1° año', 'CBC', ['@D']],
+        ['2° año', '525 hs', ['*Medios Expresivos I', 'Fundamentos Geométricos del Diseño Textil', 'Introducción al Proyecto', 'Historia del Diseño de Indumentaria y Textil I', 'Análisis del Diseño de Indumentaria y Textil I', 'Técnicas de Producción e Industria Nacional I', 'Técnicas de Producción e Industria Nacional II']],
+        ['3° año', '600 hs', ['*Proyecto Textil I', 'Procesos de Teñido, Estampado y Terminación', 'Medios Expresivos II', 'Historia del Diseño de Indumentaria y Textil II', 'Análisis del Diseño de Indumentaria y Textil II', 'Técnicas de Producción Textil I', 'Técnicas de Producción Textil II']],
+        ['4° año', '495 hs', ['*Proyecto Textil II', '*Proyecto Textil III', 'Historia Textil', 'Comunicación y Crítica', 'Sociología', 'Comercialización y Mercado I', 'Comercialización y Mercado II', 'Técnicas de Producción Textil III', 'Técnicas de Producción Textil IV']],
+        ['5° año', '405 hs', ['*Proyecto Textil IV', '*Trabajo Final de Carrera', 'Proyecto de Accesorios I', 'Ética Profesional', 'Práctica Profesional Asistida', '+Optativas I y II']]] }
+    ] },
+  { id: 'unlp', sigla: 'UNLP', nombre: 'Facultad de Artes', uni: 'UN de La Plata', ciudad: 'La Plata', sede: 'La Plata · Buenos Aires', img: 'img/unlp.jpg', color: '#fbce00', ingreso: 'Curso', web: X,
+    ingresoInfo: 'Es un curso previo que organiza la facultad antes de empezar la carrera. Fechas y modalidad en su sitio oficial.',
+    becas: [uniBeca('UNLP'), B.progresar, B.materiaViva, B.codigo],
+    carreras: [{ sigla: 'DCV', k: 'dg', nombre: 'Diseño en Comunicación Visual', dur: X, taller: 'Taller DCV 1' }, { sigla: 'DI', k: 'di', nombre: 'Diseño Industrial', dur: X, taller: 'Taller DI 1' }] },
+  { id: 'unmdp', sigla: 'UNMDP', nombre: 'Facultad de Arquitectura, Urbanismo y Diseño', uni: 'UN de Mar del Plata', ciudad: 'Mar del Plata', sede: 'Mar del Plata · Buenos Aires', img: 'img/unmdp.jpg', color: '#93ab6a', ingreso: 'Curso', web: X,
+    ingresoInfo: 'Es un curso previo que organiza la facultad antes de empezar la carrera. Fechas y modalidad en su sitio oficial.',
+    becas: [uniBeca('UNMdP'), B.progresar, B.materiaViva],
+    carreras: [{ sigla: 'ARQ', k: 'arq', nombre: 'Arquitectura', dur: X, taller: 'Arquitectura 1' }, { sigla: 'DI', k: 'di', nombre: 'Diseño Industrial', dur: X, taller: 'Diseño Industrial 1' }] },
+  { id: 'unc', sigla: 'UNC', nombre: 'Facultad de Arquitectura, Urbanismo y Diseño', uni: 'UN de Córdoba', ciudad: 'Córdoba', sede: 'Ciudad Universitaria · Córdoba', img: 'img/unc.jpg', color: '#d66fa9', ingreso: 'Curso', web: 'faud.unc.edu.ar',
+    ingresoInfo: 'Es un curso de nivelación previo a la carrera. Fechas y modalidad en el sitio oficial de la facultad.',
+    becas: [uniBeca('UNC'), B.progresar, B.proyectar],
+    carreras: [{ sigla: 'ARQ', k: 'arq', nombre: 'Arquitectura', dur: X, taller: 'Arquitectura I' }, { sigla: 'DI', k: 'di', nombre: 'Diseño Industrial', dur: X, taller: 'Diseño Industrial I' }] },
+  { id: 'unl', sigla: 'UNL', nombre: 'Facultad de Arquitectura, Diseño y Urbanismo', uni: 'UN del Litoral', ciudad: 'Santa Fe', sede: 'Ciudad Universitaria · Santa Fe', img: 'img/unl.jpg', color: '#fbce00', ingreso: 'Curso', web: 'fadu.unl.edu.ar',
+    ingresoInfo: 'Es un curso de articulación previo a la carrera. Fechas y modalidad en el sitio oficial de la facultad.',
+    becas: [uniBeca('UNL'), B.progresar, B.codigo],
+    carreras: [{ sigla: 'ARQ', k: 'arq', nombre: 'Arquitectura', dur: X, taller: 'Taller de Proyecto I' }, { sigla: 'DCV', k: 'dg', nombre: 'Diseño de la Comunicación Visual', dur: X, taller: 'Taller DCV I' }, { sigla: 'DI', k: 'di', nombre: 'Diseño Industrial', dur: X, taller: 'Taller DI I' }] },
+  { id: 'unr', sigla: 'UNR', nombre: 'Facultad de Arquitectura, Planeamiento y Diseño', uni: 'UN de Rosario', ciudad: 'Rosario', sede: 'Ciudad Universitaria · Rosario', img: 'img/unr.jpg', color: '#93ab6a', ingreso: 'Curso', web: 'fapyd.unr.edu.ar',
+    ingresoInfo: 'Es un curso de ingreso previo a la carrera. Fechas y modalidad en el sitio oficial de la facultad.',
+    becas: [uniBeca('UNR'), B.progresar, B.manifiesto],
+    carreras: [{ sigla: 'ARQ', k: 'arq', nombre: 'Arquitectura', dur: X, taller: 'Análisis Proyectual I' }] },
+  { id: 'uncuyo', sigla: 'UNCUYO', nombre: 'Facultad de Artes y Diseño', uni: 'UN de Cuyo', ciudad: 'Mendoza', sede: 'Centro Universitario · Mendoza', img: 'img/uncuyo.jpg', color: '#d66fa9', ingreso: 'Curso', web: 'fad.uncuyo.edu.ar',
+    ingresoInfo: 'Es un curso de ingreso previo a la carrera. Fechas y modalidad en el sitio oficial de la facultad.',
+    becas: [uniBeca('UNCuyo'), B.progresar, B.manifiesto, B.codigo],
+    carreras: [{ sigla: 'DG', k: 'dg', nombre: 'Diseño Gráfico', dur: X, taller: 'Diseño Gráfico I' }, { sigla: 'DI', k: 'di', nombre: 'Diseño Industrial', dur: X, taller: 'Diseño Industrial I' }, { sigla: 'CER', k: 'otras', nombre: 'Cerámica', dur: X, taller: 'Taller de Cerámica I' }] }
+];
+function facById(id) { return FACS.filter(function (f) { return f.id === id; })[0]; }
+
+var POSTS = [
+  { id: 1, autor: 'Martina López', av: 'img/av3.jpg', fac: 'fadu', carrera: 'Diseño Gráfico', ck: 'dg', sigla: 'DG', titulo: 'Sistema de identidad para un festival barrial', desc: 'Marca, afiches y señalética para la feria de fin de año de mi barrio. Todo sale de un solo signo armado con recortes.', materia: 'Diseño Gráfico I', catedra: 'Cátedra Gabriele', mark: 'Aa', color: 'yellow', likes: 128 },
+  { id: 2, autor: 'Tomás Herrera', av: 'img/av2.jpg', fac: 'fadu', carrera: 'Diseño Industrial', ck: 'di', sigla: 'DI', titulo: 'Banqueta apilable en chapa plegada', desc: 'Una sola pieza de chapa cortada y plegada, sin soldaduras. Se apilan de a diez y se fabrica en cualquier taller.', materia: 'Taller de Diseño Industrial II', catedra: 'Cátedra 2', mark: 'Ø 42', color: 'green', likes: 86 },
+  { id: 3, autor: 'Lucía Benítez', av: 'img/av7.jpg', fac: 'unlp', carrera: 'Diseño en Comunicación Visual', ck: 'dg', sigla: 'DCV', titulo: 'Afiche tipográfico: ciudad y ruido', desc: 'Serie de afiches con letras dibujadas a partir de los carteles de la avenida 7. La idea era que el texto \'suene\'.', materia: 'Taller DCV 2', catedra: 'Cátedra 1', mark: 'R/', color: 'pink', likes: 203 },
+  { id: 4, autor: 'Joaquín Paz', av: 'img/av8.jpg', fac: 'fadu', carrera: 'Arquitectura', ck: 'arq', sigla: 'ARQ', titulo: 'Vivienda colectiva en el borde del Riachuelo', desc: 'Edificio de 24 viviendas con planta baja abierta al barrio y patios compartidos cada dos pisos.', materia: 'Arquitectura III', catedra: 'Cátedra 3', mark: '1:200', color: 'navy', likes: 154 },
+  { id: 5, autor: 'Valentina Ruiz', av: 'img/av9.jpg', fac: 'unmdp', carrera: 'Diseño Industrial', ck: 'di', sigla: 'DI', titulo: 'Luminaria de suspensión en cerámica', desc: 'Pantalla de gres torneada a mano con perforaciones que dibujan la luz en la pared. Prototipo hecho en el taller de la facu.', materia: 'Diseño Industrial 1', catedra: 'Cátedra 1', mark: '370', color: 'yellow', likes: 61 },
+  { id: 6, autor: 'Mateo Quispe', av: 'img/av4.jpg', fac: 'fadu', carrera: 'Diseño Gráfico', ck: 'dg', sigla: 'DG', titulo: 'Rediseño de señalética para una línea de colectivo', desc: 'Propuesta de paradas, recorridos y numeración para la línea 47, pensada para leerse de lejos y de noche.', materia: 'Tipografía II', catedra: 'Cátedra Cosgaya', mark: '→47', color: 'green', likes: 97 },
+  { id: 7, autor: 'Clara Sosa', av: 'img/av5.jpg', fac: 'unlp', carrera: 'Diseño Industrial', ck: 'di', sigla: 'DI', titulo: 'Mate ergonómico en madera torneada', desc: 'Mate de algarrobo con una base ancha que no se vuelca y un hueco para el pulgar. Lo probamos con 20 personas.', materia: 'Taller DI 1', catedra: 'Cátedra 1', mark: 'Ø 8', color: 'pink', likes: 112 },
+  { id: 8, autor: 'Agustín Romero', av: 'img/av6.jpg', fac: 'unmdp', carrera: 'Arquitectura', ck: 'arq', sigla: 'ARQ', titulo: 'Parador de playa en estructura de madera', desc: 'Parador desarmable para la costa: módulos de madera que se montan en verano y se guardan en invierno.', materia: 'Arquitectura 2', catedra: 'Cátedra 2', mark: 'N↑', color: 'yellow', likes: 74 },
+  { id: 9, autor: 'Franco Medina', av: 'img/av10.jpg', fac: 'fadu', carrera: 'Diseño Industrial', ck: 'di', sigla: 'DI', titulo: 'Silla plegable para espacios públicos', desc: 'Silla que se pliega contra la pared en plazas y bibliotecas populares. Estructura de caño y asiento de multilaminado.', materia: 'Taller de Diseño Industrial I', catedra: 'Cátedra 3', mark: '1:1', color: 'navy', likes: 59 }
+];
+var TILE = { pink: { bg: '#d66fa9', fg: '#1f2449' }, yellow: { bg: '#fbce00', fg: '#1f2449' }, green: { bg: '#93ab6a', fg: '#1f2449' }, navy: { bg: '#1f2449', fg: '#d66fa9' } };
+
+/* cátedras y horarios reales de Diseño Gráfico (FADU), fuente: fadu.uba.ar */
+var TURNOS = { M: ['Mañana', '8:30 a 12:30 hs'], T: ['Tarde', '14 a 18 hs'], N: ['Noche', '19 a 23 hs'], X: ['A confirmar', 'Horario a confirmar'] };
+function cats(dia, lista) { return lista.map(function (x) { return { n: x[0], s: [[dia, x[1]]] }; }); }
+var TALLER_DG = [['Melon', 'M'], ['Ex Mazzeo', 'M'], ['Meygide', 'M'], ['Pujol', 'M'], ['Díaz Colodrero', 'T'], ['Ex Belluccia', 'N'], ['Diseño Transforma', 'N'], ['Gabriele', 'N'], ['Ex Rico', 'N'], ['Salomone', 'N'], ['Ex Wolkowicz', 'N']];
+var MORFO_DG = [['Longinotti', 'M'], ['Pescio', 'M'], ['Wainhaus', 'M'], ['Brignone', 'N'], ['Ex Mazzeo', 'N'], ['Ex Pereyra', 'N']];
+var HORARIOS = {
+  'fadu|Diseño Gráfico I': { regimen: 'Anual · jueves', cats: cats('Jueves', TALLER_DG.map(function (x) { return x[0] === 'Meygide' ? ['Meygide Carpintero', 'M'] : x; })) },
+  'fadu|Diseño Gráfico II': { regimen: 'Anual · lunes y jueves', cats: cats('Lunes y jueves', TALLER_DG) },
+  'fadu|Diseño Gráfico III': { regimen: 'Anual · lunes y jueves', cats: cats('Lunes y jueves', TALLER_DG) },
+  'fadu|Diseño Gráfico IV': { regimen: 'Anual · lunes o jueves', cats: [['Ex Mazzeo', 'Lunes', 'M'], ['Pujol', 'Jueves', 'M'], ['Meygide', 'Jueves', 'M'], ['Díaz Colodrero', 'Jueves', 'T'], ['Ex Wolkowicz', 'Lunes', 'N'], ['Gabriele', 'Lunes', 'N'], ['Ex Belluccia', 'Jueves', 'N'], ['Diseño Transforma', 'Jueves', 'N'], ['Salomone', 'Jueves', 'N'], ['Ex Rico', 'Jueves', 'N']].map(function (x) { return { n: x[0], s: [[x[1], x[2]]] }; }) },
+  'fadu|Morfología I': { regimen: 'Anual · martes', cats: cats('Martes', MORFO_DG) },
+  'fadu|Morfología II': { regimen: 'Anual · martes', cats: cats('Martes', MORFO_DG) },
+  'fadu|Tipografía I': { regimen: 'Anual · miércoles, viernes o sábado', cats: [{ n: 'Venancio + Contreras', s: [['Miércoles', 'M'], ['Miércoles', 'N']] }, { n: 'Gaitto', s: [['Viernes', 'T']] }, { n: 'Carbone', s: [['Viernes', 'N']] }, { n: 'Cosgaya', s: [['Viernes', 'N']] }, { n: 'Longinotti', s: [['Viernes', 'N']] }, { n: 'Ex González', s: [['Sábado', 'M']] }] },
+  'fadu|Tipografía II': { regimen: 'Anual · miércoles, viernes o sábado', cats: [{ n: 'Venancio + Contreras', s: [['Miércoles', 'N']] }, { n: 'Gaitto', s: [['Viernes', 'T']] }, { n: 'Carbone', s: [['Viernes', 'N']] }, { n: 'Cosgaya', s: [['Viernes', 'N']] }, { n: 'Longinotti', s: [['Viernes', 'N']] }, { n: 'Ex González', s: [['Sábado', 'M']] }] },
+  'fadu|Comunicación I': { regimen: '1° y 2° cuatrimestre · miércoles', cats: cats('Miércoles', [['Devalle', 'M'], ['Carpintero', 'T'], ['Ex Ledesma', 'N']]) },
+  'fadu|Comunicación II': { regimen: '1° y 2° cuatrimestre · miércoles', cats: cats('Miércoles', [['Devalle', 'M'], ['Carpintero', 'T'], ['Ex Ledesma', 'N']]) },
+  'fadu|Historia I': { regimen: '1° y 2° cuatrimestre · miércoles', cats: cats('Miércoles', [['Gavito', 'M'], ['Ex Gené', 'M'], ['Ex Calabrese', 'N']]) },
+  'fadu|Historia II': { regimen: '1° y 2° cuatrimestre · miércoles', cats: cats('Miércoles', [['Ex Gené', 'M'], ['Gavito', 'N'], ['Ex Calabrese', 'N']]) },
+  'fadu|Tecnología I': { regimen: '1° y 2° cuatrimestre · viernes', cats: [{ n: 'Bernadou', s: [['Viernes', 'M'], ['Viernes', 'T']] }, { n: 'Ex Zachin', s: [['Viernes', 'M'], ['Viernes', 'N']] }] },
+  'fadu|Tecnología II': { regimen: '1° y 2° cuatrimestre · viernes', cats: [{ n: 'Bernadou', s: [['Viernes', 'M'], ['Viernes', 'T']] }, { n: 'Ex Zachin', s: [['Viernes', 'M'], ['Viernes', 'N']] }] },
+  'fadu|Medios Expresivos I': { regimen: '1° y 2° cuatrimestre · viernes', cats: cats('Viernes', [['Campos', 'M'], ['Ex Feller', 'X'], ['Groisman', 'N']]) },
+  'fadu|Medios Expresivos II': { regimen: '1° y 2° cuatrimestre · viernes', cats: cats('Viernes', [['Campos', 'M'], ['Ex Feller', 'M'], ['Groisman', 'N']]) },
+  'fadu|Legislación y Práctica Profesional': { regimen: '1° y 2° cuatrimestre · martes', cats: cats('Martes', [['Rodriguez Alcala', 'M'], ['Jelonche', 'N']]) },
+  'fadu|Electiva I': { regimen: '1° y 2° cuatrimestre · elegís una', cats: [{ g: 'Fotografía', n: 'Ex Trilnick', s: [['Miércoles', 'M']] }, { g: 'Fotografía', n: 'Gallo', s: [['Lunes', 'N']] }, { g: 'Ilustración', n: 'Taller experimental', s: [['Lunes', 'M']] }, { g: 'Ilustración', n: 'Roldán', s: [['Lunes', 'N']] }] },
+  'fadu|Electiva Socio-Humanística': { regimen: 'Cuatrimestral · elegís una', sinHora: true, cats: [
+    { g: 'Estética', n: 'Herke', s: [['Martes', 'M', '1° y 2° cuat.'], ['Miércoles', 'T', '1° cuat.'], ['Miércoles', 'N', '2° cuat.']] },
+    { g: 'Estética', n: 'Piatelli', s: [['Lunes', 'N', '1° cuat.'], ['Lunes', 'T', '2° cuat.']] },
+    { g: 'Aspectos económicos del diseño', n: 'Venancio', s: [['Miércoles', 'N', '1° y 2° cuat.']] },
+    { g: 'Diseño y estudios culturales', n: 'Devalle', s: [['Martes', 'N', '1° y 2° cuat.']] },
+    { g: 'Elementos de Psicología', n: 'Ex Meygide', s: [['Miércoles', 'N', '2° cuat.']] },
+    { g: 'Diseño y estudios de género', n: 'Flesler', s: [['Viernes', 'N', '1° y 2° cuat.']] },
+    { g: 'Teoría de los medios', n: 'Vega Terra', s: [['Jueves', 'T', '1° y 2° cuat.']] }] }
+};
+var SIN_CATEDRA_FIJA = { 'Electiva Orientada I': 1, 'Electiva Orientada II': 1, 'Optativas I y II': 1, 'Seminarios optativos I, II y III': 1 };
+var HORARIOS_CARRERA = { fadu: 'DG' };
+function horariosDe(fac, nombre, car) { if (car && HORARIOS_CARRERA[fac] && car !== HORARIOS_CARRERA[fac]) return null; return HORARIOS[fac + '|' + nombre.replace('¹', '')] || null; }
+function catedrasDe(fac, nombre, car) { var h = horariosDe(fac, nombre, car); return h ? h.cats.map(function (x) { return 'Cátedra ' + x.n; }).filter(function (v, i, a) { return a.indexOf(v) === i; }) : CATEDRAS; }
+
+/* contenido de materias por disciplina y nivel (texto de ejemplo para el prototipo) */
+var PROGRAMAS = {
+  dg1: { carrera: 'Diseño Gráfico', desc: 'Primer contacto con el proyecto gráfico: cómo pasar de una idea a un sistema visual que comunica.',
+    tps: [['Signo y forma', 'Exploración de figura y fondo, ritmo y contraste a partir de un signo propio. Se arranca en papel con tinta y recortes, y después se digitaliza.'],
+      ['Marca e identidad', 'Diseño de la marca de una organización barrial real: isologotipo, paleta, tipografías y un manual básico de uso.'],
+      ['Afiche y sistema de piezas', 'Campaña para un evento cultural: el afiche principal y su adaptación a flyer, posteo para redes y señalética del lugar.']],
+    herramientas: ['Lápiz y papel', 'Collage', 'Illustrator', 'InDesign'] },
+  dg2: { carrera: 'Diseño Gráfico', desc: 'Proyectos más largos y complejos: sistemas editoriales, identidades institucionales y campañas para clientes reales.',
+    tps: [['Sistema editorial', 'Diseño de una revista o colección de libros: grilla, jerarquías tipográficas y tapa, con un número completo maquetado.'],
+      ['Identidad institucional', 'Marca y sistema de aplicaciones para una institución pública: señalética, papelería y piezas digitales.'],
+      ['Campaña de bien público', 'Campaña multiplataforma sobre un tema social: afiches en vía pública, video corto y redes.']],
+    herramientas: ['InDesign', 'Illustrator', 'After Effects', 'Prototipos impresos'] },
+  tipo: { carrera: 'Diseño Gráfico', desc: 'Se profundiza en la tipografía y la comunicación visual aplicada a problemas reales de la ciudad.',
+    tps: [['Anatomía de la letra', 'Análisis de una familia tipográfica clásica: proporciones, contraste y ritmo. Se redibuja a mano en gran escala.'],
+      ['Alfabeto display', 'Diseño de un alfabeto completo inspirado en la gráfica popular del barrio, desde el boceto hasta la fuente digital.'],
+      ['Aplicación en contexto', 'El alfabeto se pone a prueba en una pieza real: señalética, revista o identidad de un comercio.']],
+    herramientas: ['Lápiz y calco', 'Glyphs', 'Illustrator', 'InDesign'] },
+  morfo: { carrera: 'Diseño', desc: 'Estudio de la forma: cómo se organiza, se percibe y se transforma en el plano y en el espacio.',
+    tps: [['Forma y estructura', 'Series de composiciones con módulos y tramas para entender ritmo, simetría y proporción.'],
+      ['Color', 'Paletas y escalas a partir de un relevamiento propio: contraste, armonía y temperatura.'],
+      ['Del plano al volumen', 'Transformación de una composición plana en un objeto tridimensional en papel o cartón.']],
+    herramientas: ['Papel y cartón', 'Témperas', 'Regla y escuadra', 'Illustrator'] },
+  comu: { carrera: 'Diseño Gráfico', desc: 'Teorías de la comunicación y la semiótica aplicadas a leer y producir mensajes visuales.',
+    tps: [['Análisis de piezas', 'Lectura crítica de afiches y publicidades: qué dicen, a quién y cómo.'],
+      ['Público y contexto', 'Investigación sobre un público real con entrevistas y observación.'],
+      ['Ensayo visual', 'Producción de una pieza que argumenta una idea, acompañada de un texto breve.']],
+    herramientas: ['Lecturas teóricas', 'Entrevistas', 'Ensayo escrito'] },
+  hist: { carrera: 'Diseño', desc: 'Recorrido por la historia del diseño, el arte y la cultura visual para entender de dónde vienen las ideas de hoy.',
+    tps: [['Línea de tiempo', 'Mapa visual de movimientos, autores y objetos de un período.'],
+      ['Análisis de una pieza histórica', 'Investigación sobre una obra o diseño en su contexto social y técnico.'],
+      ['Monografía', 'Trabajo escrito en grupo sobre un tema elegido, con presentación oral.']],
+    herramientas: ['Biblioteca FADU', 'Archivo y museos', 'Presentaciones'] },
+  tec: { carrera: 'Diseño', desc: 'Materiales, procesos de producción y sistemas de impresión: cómo se fabrica lo que se diseña.',
+    tps: [['Sistemas de impresión', 'Visita a una imprenta y relevamiento de offset, digital y serigrafía.'],
+      ['Preimpresión', 'Preparación de un archivo para imprenta: color, sangrado, perfiles y pruebas.'],
+      ['Producción y costos', 'Presupuesto de una pieza real comparando papeles, tiradas y terminaciones.']],
+    herramientas: ['Muestrarios de papel', 'Acrobat', 'Visitas a talleres'] },
+  medios: { carrera: 'Diseño Gráfico', desc: 'Lenguajes expresivos como la fotografía, la ilustración y la imagen en movimiento aplicados al diseño.',
+    tps: [['Registro fotográfico', 'Serie de fotos sobre un tema con decisiones de luz, encuadre y edición.'],
+      ['Ilustración', 'Desarrollo de un personaje o una serie ilustrada con técnica propia.'],
+      ['Imagen en movimiento', 'Animación corta que combina tipografía, imagen y sonido.']],
+    herramientas: ['Cámara', 'Técnicas mixtas', 'Photoshop', 'After Effects'] },
+  legis: { carrera: 'Diseño Gráfico', desc: 'El diseño como profesión: derechos de autor, contratos, presupuestos y ética.',
+    tps: [['Propiedad intelectual', 'Casos reales de marcas registradas, plagio y licencias.'],
+      ['Presupuesto y contrato', 'Armado de una propuesta comercial completa para un cliente ficticio.'],
+      ['Plan profesional', 'Proyecto de estudio, emprendimiento o inserción laboral propio.']],
+    herramientas: ['Casos reales', 'Planillas de costos', 'Modelos de contrato'] },
+  electiva: { carrera: 'Diseño Gráfico', desc: 'Materia que elegís vos según tus intereses. Cada opción tiene su propio programa.',
+    tps: [['Elegí tu opción', 'Revisá las cátedras de abajo: cada una corresponde a una electiva distinta.'],
+      ['Cursada', 'Trabajos prácticos propios de cada electiva, en talleres de grupos chicos.'],
+      ['Entrega final', 'Un proyecto final que suele sumarse a tu portfolio.']],
+    herramientas: ['Según la electiva'] },
+  arq1: { carrera: 'Arquitectura', desc: 'Introducción al proyecto: leer un lugar, entender cómo se habita y transformarlo en espacio.',
+    tps: [['Lugar y recorrido', 'Relevamiento de un sitio real con croquis, fotos y mediciones. Cierra con una maqueta de implantación en escala 1:500.'],
+      ['Refugio mínimo', 'Proyecto de un espacio de 9 m² para una persona: luz, apertura y materialidad, resuelto en maqueta 1:20.'],
+      ['Vivienda individual', 'Casa para una familia en un lote entre medianeras. Plantas, cortes y maqueta final en 1:50.']],
+    herramientas: ['Croquis a mano', 'Maquetas en cartón', 'AutoCAD', 'SketchUp'] },
+  arq2: { carrera: 'Arquitectura', desc: 'El proyecto crece en escala: de la vivienda al edificio y su relación con la ciudad.',
+    tps: [['Lectura urbana', 'Análisis de un fragmento de ciudad: llenos y vacíos, usos, movilidad y espacio público, en planos y maqueta.'],
+      ['Programa y partido', 'Definición de qué se construye y por qué. Se ensayan varias ideas de implantación hasta elegir un partido.'],
+      ['Edificio de vivienda colectiva', 'Desarrollo del proyecto con estructura, circulaciones y unidades tipo. Entrega con láminas y maqueta 1:100.']],
+    herramientas: ['Croquis', 'Maquetas', 'Revit', 'Render en Lumion'] },
+  di1: { carrera: 'Diseño Industrial', desc: 'Primer acercamiento al diseño de objetos: observar cómo se usan las cosas y proponer mejoras.',
+    tps: [['Objeto y uso', 'Observación de un objeto cotidiano en uso real. Se registran gestos, problemas y oportunidades de mejora.'],
+      ['Prototipo en cartón', 'Primera propuesta construida a escala real en cartón y papel para probar medidas y manipulación.'],
+      ['Producto de un solo material', 'Diseño de un objeto resuelto con un único material y proceso. Se presenta con planos técnicos y modelo final.']],
+    herramientas: ['Bocetos', 'Cartón y foam', 'Rhino', 'Taller de maquetería'] },
+  di2: { carrera: 'Diseño Industrial', desc: 'Se trabaja con procesos productivos reales y prototipos funcionales.',
+    tps: [['Análisis de producto', 'Desarme de un producto del mercado: piezas, uniones, materiales y costos de fabricación.'],
+      ['Mueble en chapa o madera', 'Diseño de un mueble pensado para fabricarse en un taller local, con despiece y planos de producción.'],
+      ['Prototipo funcional', 'Construcción a escala 1:1 y prueba con usuarios. Se ajusta el diseño según lo que se observa.']],
+    herramientas: ['Rhino', 'KeyShot', 'Corte láser', 'Taller de madera y metal'] },
+  dis: { carrera: 'Diseño de Imagen y Sonido', desc: 'Iniciación al lenguaje audiovisual: imagen, sonido y montaje como herramientas de relato.',
+    tps: [['Plano y secuencia', 'Una historia contada en 10 planos fijos, sin diálogo. Se trabaja el encuadre, la luz y el orden de las imágenes.'],
+      ['Paisaje sonoro', 'Registro y edición de 2 minutos de sonido de un lugar de la ciudad, sin imágenes.'],
+      ['Cortometraje', 'Corto de 3 minutos en grupo: guion, rodaje y montaje, con roles rotativos.']],
+    herramientas: ['Cámara y trípode', 'Grabador de sonido', 'Premiere', 'Audacity'] },
+  ind: { carrera: 'Diseño de Indumentaria', desc: 'Primer proyecto de indumentaria: del cuerpo a la moldería y de la idea a la prenda.',
+    tps: [['Moldería base', 'Toma de medidas y construcción de los moldes base de una prenda superior e inferior.'],
+      ['Prenda desde una tipología', 'Se elige una prenda clásica (camisa, campera, pantalón) y se la transforma con un concepto propio.'],
+      ['Minicolección', 'Cinco looks con una idea en común: paneles de inspiración, figurines, fichas técnicas y un prototipo confeccionado.']],
+    herramientas: ['Moldería a mano', 'Máquina de coser', 'Figurín', 'Illustrator'] },
+  tex: { carrera: 'Diseño Textil', desc: 'Exploración de la superficie textil: estructuras, color y repetición.',
+    tps: [['Estructuras textiles', 'Muestrario de tejidos a mano: tramas, ligamentos y texturas con distintos hilados.'],
+      ['Estampado y repetición', 'Diseño de un rapport a partir de un relevamiento fotográfico, estampado en serigrafía.'],
+      ['Colección de superficies', 'Serie de textiles para un uso concreto (tapicería, indumentaria o accesorios) con fichas técnicas.']],
+    herramientas: ['Telar manual', 'Serigrafía', 'Tintes', 'Photoshop'] },
+  cer: { carrera: 'Cerámica', desc: 'Trabajo con la arcilla desde el modelado a mano hasta la pieza terminada.',
+    tps: [['Modelado a mano', 'Piezas con las técnicas de pellizco, placa y lazo para conocer el material.'],
+      ['Torno y forma', 'Serie de cilindros y cuencos en torno buscando control de espesor y proporción.'],
+      ['Pieza utilitaria', 'Diseño de un juego de vajilla para un uso concreto, esmaltado y cocido en horno.']],
+    herramientas: ['Arcilla', 'Torno', 'Esmaltes', 'Horno cerámico'] }
+};
+function programaPara(nombre) {
+  var n = norm(nombre), avanzado = /\b(ii|iii|iv|2|3|4)\b/.test(n);
+  if (/electiva|optativ|seminario/.test(n)) return 'electiva';
+  if (/morfologia/.test(n)) return 'morfo';
+  if (/tipografia/.test(n)) return 'tipo';
+  if (/comunicacion i|comunicacion$|comunicacion ii/.test(n) && !/visual/.test(n)) return 'comu';
+  if (/historia/.test(n)) return 'hist';
+  if (/tecnologia/.test(n)) return 'tec';
+  if (/medios expresivos/.test(n) && !/indumentaria|textil/.test(n)) return 'medios';
+  if (/legislacion|practica profesional/.test(n)) return 'legis';
+  if (/ceramica/.test(n)) return 'cer';
+  if (/textil/.test(n)) return 'tex';
+  if (/indumentaria/.test(n)) return 'ind';
+  if (/audiovisual/.test(n)) return 'dis';
+  if (/arquitectura|proyecto i\b|proyecto$|analisis proyectual|taller de proyecto/.test(n)) return avanzado ? 'arq2' : 'arq1';
+  if (/industrial|\bdi\b/.test(n)) return avanzado ? 'di2' : 'di1';
+  return avanzado ? 'dg2' : 'dg1';
+}
+function anioEnPlan(fac, nombre, car) {
+  var f = facById(fac), res = null;
+  f.carreras.filter(function (c) { return !car || c.sigla === car; }).forEach(function (c) { (c.plan || []).forEach(function (y) { if (!res && y[2].some(function (m) { return m.replace(/^[*+]/, '').replace('¹', '') === nombre; })) res = y[0] + (y[1] && !/hs/.test(y[1]) ? ' · ' + y[1].replace(' · ¹ o en 4°', '') : ''); }); });
+  return res;
+}
+function materiaKey(fac, nombre) { return fac + '|' + nombre; }
+function getMateria(fac, nombre, catedra, car) {
+  var f = facById(fac), pg = PROGRAMAS[programaPara(nombre)];
+  return {
+    key: materiaKey(fac, nombre), fac: fac, facSigla: f.sigla, nombre: nombre, catedra: catedra || 'Cátedra 1',
+    carrera: (car && carreraDe(fac, car) ? carreraDe(fac, car).nombre : null) || (f.carreras.filter(function (x) { return (x.plan || []).some(function (y) { return y[2].some(function (m) { return m.replace(/^[*+]/, '').replace('¹', '') === nombre; }); }); })[0] || {}).nombre || pg.carrera,
+    horarios: horariosDe(fac, nombre, car), anio: anioEnPlan(fac, nombre, car) || anioEnPlan(fac, nombre) || (/\b(ii|2)\b/.test(norm(nombre)) ? 'Segundo nivel' : /\b(iii|3)\b/.test(norm(nombre)) ? 'Tercer nivel' : 'Primer nivel'),
+    regimen: (horariosDe(fac, nombre, car) || {}).regimen || 'Anual', desc: pg.desc, tps: pg.tps, herramientas: pg.herramientas
+  };
+}
+
+var DEMO = { nombre: 'Sofía', apellido: 'Ramírez', email: 'sofia@mail.com', pass: 'diseño123', prov: 'ba', nivel: 'secundaria', anio: '5° año', facu: '', carrera: '', anioCar: '', edad: '17', intereses: ['DG', 'UX'], avatar: 'img/av1.jpg', saved: { posts: [], facs: [], materias: [], becas: [] }, likes: [] };
+var DEMO2 = { nombre: 'Martina', apellido: 'López', email: 'martina@mail.com', pass: 'diseño123', prov: 'caba', nivel: 'facultad', anio: '', facu: 'fadu', carrera: 'DG', anioCar: '3° año', edad: '21', intereses: ['DG', 'UX'], avatar: 'img/av3.jpg', saved: { posts: [], facs: [], materias: [], becas: [] }, likes: [] };
+
+function norm(t) { return (t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); }
+var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+function emailError(v) {
+  v = (v || '').trim();
+  if (!v) return 'Escribí tu email';
+  if (v.indexOf('@') < 0) return 'Le falta el @ (ej: nombre@mail.com)';
+  if (!EMAIL_RE.test(v)) return 'Revisá el final: tiene que terminar tipo .com o .ar';
+  return '';
+}
+
+/* ---------- piezas reutilizables ---------- */
+function Msg(text, kind) {
+  if (!text) return null;
+  return html`<span className=${'msg ' + (kind || 'err')} role=${kind === 'ok' ? null : 'alert'}>${I(kind === 'ok' ? 'check' : 'alert', 14, { sw: 2.6 })}<span>${text}</span></span>`;
+}
+function Avatar(u, size) {
+  if (u.avatar) return html`<img className="avatar" src=${u.avatar} alt="" width=${size} height=${size} style=${{ width: size, height: size }} />`;
+  var ini = ((u.nombre || '?')[0] + (u.apellido ? u.apellido[0] : '')).toUpperCase();
+  return html`<span className="avatar-ini halftone" style=${{ width: size, height: size, fontSize: size * 0.36 }}>${ini}</span>`;
+}
+
+/* =========================================================== */
+function App() {
+  var users0 = store.get('dlqv_users', {});
+  users0[DEMO.email] = Object.assign({}, DEMO, users0[DEMO.email] || {});
+  users0[DEMO2.email] = Object.assign({}, DEMO2, users0[DEMO2.email] || {});
+  Object.keys(users0).forEach(function (k) { var x = users0[k]; if (!x.nivel) x.nivel = 'secundaria'; if (x.anio === 'Ya terminé') x.anio = '6° año'; });
+  var sess = store.get('dlqv_session', null);
+
+  var st = useState({
+    users: users0, email: sess && users0[sess] ? sess : null,
+    screen: sess && users0[sess] ? 'app' : 'login',
+    tab: 'inicio', stack: [],
+    login: { email: '', pass: '', show: false, error: null, touched: {} },
+    reg: { step: 1, d: REG_VACIO(), touched: {}, tried: {}, show: false },
+    posts: store.get('dlqv_posts', []), subir: null, borrar: null,
+    feed: { fac: 'todas', car: 'todas', q: '', buscando: false }, tip: true,
+    lista: { zona: 'cerca', car: 'todas', q: '' },
+    det: { tab: 'carreras', openCar: null, info: false },
+    perfil: { form: null, touched: {}, tried: false, seg: 'posts' },
+    aviso: false, zoom: null, sheet: null, toast: null
+  });
+  var S = st[0], setS = st[1];
+  var tRef = useRef(null);
+  var scrollKey = S.screen + '|' + S.tab + '|' + S.stack.length + '|' + (S.stack.length ? JSON.stringify(S.stack[S.stack.length - 1]) : '');
+
+  function up(patch) { setS(function (prev) { return Object.assign({}, prev, typeof patch === 'function' ? patch(prev) : patch); }); }
+  function sub(key, patch) { up(function (p) { var o = {}; o[key] = Object.assign({}, p[key], patch); return o; }); }
+  function notify(msg, undo, error) {
+    clearTimeout(tRef.current);
+    up({ toast: { msg: msg, undo: undo || null, error: !!error } });
+    tRef.current = setTimeout(function () { up({ toast: null }); }, undo ? 5000 : 3200);
+  }
+  function closeToast() { clearTimeout(tRef.current); up({ toast: null }); }
+
+  useEffect(function () { store.set('dlqv_users', S.users); }, [S.users]);
+  useEffect(function () { store.set('dlqv_session', S.email); }, [S.email]);
+  useEffect(function () { return function () { clearTimeout(tRef.current); }; }, []);
+
+  var user = S.email ? S.users[S.email] : null;
+  function updUser(fn) {
+    up(function (p) {
+      var u = JSON.parse(JSON.stringify(p.users[p.email]));
+      fn(u);
+      var users = Object.assign({}, p.users); users[p.email] = u;
+      return { users: users };
+    });
+  }
+  function toggleIn(listName, id, msgs) {
+    var was = user.saved[listName].indexOf(id) >= 0;
+    updUser(function (u) { var a = u.saved[listName]; if (was) a.splice(a.indexOf(id), 1); else a.push(id); });
+    notify(was ? msgs[1] : msgs[0], function () {
+      updUser(function (u) { var a = u.saved[listName]; var i = a.indexOf(id); if (was && i < 0) a.push(id); if (!was && i >= 0) a.splice(i, 1); });
+    });
+  }
+  function isSaved(listName, id) { return !!user && user.saved[listName].indexOf(id) >= 0; }
+
+  var allPosts = S.posts.concat(POSTS);
+  function savePosts(list) {
+    try { localStorage.setItem('dlqv_posts', JSON.stringify(list)); }
+    catch (e) { if (/quota/i.test(e.name + e.message)) return false; }
+    mem.dlqv_posts = list; return true;
+  }
+  function addPost(post) {
+    var list = [post].concat(S.posts);
+    if (!savePosts(list)) return false;
+    up({ posts: list }); return true;
+  }
+  function removePost(id) {
+    up(function (p) { var list = p.posts.filter(function (x) { return x.id !== id; }); savePosts(list); return { posts: list }; });
+  }
+  function restorePost(post) {
+    up(function (p) { var list = [post].concat(p.posts.filter(function (x) { return x.id !== post.id; })); savePosts(list); return { posts: list }; });
+  }
+  function openSubir() {
+    up(function (p) { var u = p.users[p.email]; return { subir: { fotos: [], titulo: '', desc: '', fac: u.nivel === 'facultad' ? u.facu : '', car: u.nivel === 'facultad' ? u.carrera : '', mat: '', cat: '', touched: {}, tried: false, cargando: 0 }, stack: p.stack.concat([{ type: 'subir' }]), zoom: null }; });
+  }
+  function push(view) { up(function (p) { return { stack: p.stack.concat([view]), zoom: null, matTurno: 'todos', matTab: 'cursada' }; }); if (view.type === 'facultad') sub('det', { tab: 'carreras', openCar: null, info: false }); }
+  function back() { up(function (p) { return { stack: p.stack.slice(0, -1), zoom: null }; }); }
+  function goTab(t) { up(function (p) { return { tab: t, stack: p.tab === t ? [] : [], zoom: null }; }); }
+  function login(email) {
+    up({ email: email, screen: 'app', tab: 'inicio', stack: [], tip: true, login: { email: '', pass: '', show: false, error: null, touched: {} } });
+  }
+  function logout() {
+    up({ email: null, screen: 'login', sheet: null, stack: [], perfil: { form: null, touched: {}, tried: false, seg: 'posts' } });
+    notify('Cerraste sesión');
+  }
+
+  var ctx = { openSubir: openSubir, allPosts: allPosts, addPost: addPost, removePost: removePost, restorePost: restorePost, S: S, up: up, sub: sub, notify: notify, user: user, updUser: updUser, toggleIn: toggleIn, isSaved: isSaved, push: push, back: back, goTab: goTab, login: login, logout: logout };
+
+  var body;
+  if (S.screen === 'login') body = LoginScreen(ctx);
+  else if (S.screen === 'registro') body = RegistroScreen(ctx);
+  else {
+    var top = S.stack[S.stack.length - 1];
+    var view = top ? (top.type === 'facultad' ? FacultadScreen(ctx, top) : top.type === 'subir' ? SubirScreen(ctx) : MateriaScreen(ctx, top))
+      : S.tab === 'inicio' ? InicioScreen(ctx) : S.tab === 'facultades' ? FacultadesScreen(ctx) : PerfilScreen(ctx);
+    var nSaved = user ? user.saved.posts.length + user.saved.facs.length + user.saved.materias.length + user.saved.becas.length : 0;
+    body = html`<div className="screen">
+      <div className="screen" key=${scrollKey}>${view}</div>
+      <nav className="tabbar" aria-label="Secciones">
+        ${[['inicio', 'Inicio', 'home'], ['facultades', 'Facultades', 'fac'], ['perfil', 'Perfil', 'user']].map(function (t) {
+          var on = S.tab === t[0];
+          return html`<button key=${t[0]} type="button" className=${'tab' + (on ? ' on' : '')} aria-current=${on ? 'page' : null} onClick=${function () { goTab(t[0]); }}>
+            ${I(t[2], 22, { sw: on ? 2 : 1.7 })}${t[1].toUpperCase()}
+            ${t[0] === 'perfil' && nSaved > 0 ? html`<span className="badge" aria-label=${nSaved + ' guardados'}>${nSaved}</span>` : null}
+          </button>`;
+        })}
+      </nav>
+    </div>`;
+  }
+
+  var t = S.toast;
+  var toastBottom = S.screen === 'app' ? (S.tab === 'inicio' && !S.stack.length ? 152 : 84) : 20;
+  return html`<div className="stage"><main className="app" aria-label="Diseña lo que viene">
+    ${body}
+    ${t ? html`<div className=${'toast' + (t.error ? ' err' : '')} role="status" aria-live="polite" style=${{ bottom: toastBottom }}>
+      ${I(t.error ? 'alert' : 'check', 18, { sw: 2.8, color: t.error ? '#1f2449' : '#d66fa9' })}
+      <span style=${{ flex: 1, lineHeight: 1.3 }}>${t.msg}</span>
+      ${t.undo ? html`<button type="button" className="undo" onClick=${function () { var u = t.undo; closeToast(); u(); }}>DESHACER</button>` : null}
+      <button type="button" className="icon-btn plain" style=${{ width: 34, height: 34, color: 'inherit' }} aria-label="Cerrar aviso" onClick=${closeToast}>${I('x', 13, { sw: 3 })}</button>
+    </div>` : null}
+    ${S.sheet === 'ayuda' ? AyudaSheet(ctx) : null}
+    ${S.catSheet ? CatedraSheet(ctx) : null}
+    ${S.sheet === 'logout' ? LogoutSheet(ctx) : null}
+    ${S.sheet === 'descartar' ? ConfirmSheet(ctx, '¿Descartar este trabajo?', 'Se van a perder las fotos y los textos que cargaste.', 'Seguir editando', 'Descartar', function () { ctx.up({ sheet: null, subir: null }); ctx.back(); }) : null}
+    ${S.borrar ? ConfirmSheet(ctx, '¿Eliminar tu trabajo?', 'Se va a borrar de Inicio y de la materia. Vas a poder deshacerlo unos segundos.', 'Cancelar', 'Eliminar', function () {
+      var post = S.posts.filter(function (x) { return x.id === S.borrar; })[0];
+      ctx.up({ borrar: null }); ctx.removePost(S.borrar);
+      ctx.notify('Eliminaste tu trabajo', function () { ctx.restorePost(post); });
+    }, function () { ctx.up({ borrar: null }); }) : null}
+    ${S.zoom ? ZoomView(ctx) : null}
+  </main></div>`;
+}
+
+/* ---------------- LOGIN ---------------- */
+function LoginScreen(c) {
+  var L = c.S.login;
+  var eErr = L.touched.email ? emailError(L.email) : '';
+  var pErr = L.touched.pass && !L.pass ? 'Escribí tu contraseña' : '';
+  function submit(e) {
+    e.preventDefault();
+    var em = L.email.trim().toLowerCase();
+    var ee = emailError(em);
+    if (ee || !L.pass) { c.sub('login', { touched: { email: true, pass: true }, error: null }); return; }
+    var u = c.S.users[em];
+    if (!u) { c.sub('login', { error: 'noexiste' }); return; }
+    if (u.pass !== L.pass) { c.sub('login', { error: 'pass' }); return; }
+    c.login(em);
+    c.notify('¡Hola, ' + u.nombre + '! Qué bueno verte de nuevo');
+  }
+  function demo(d) { c.login(d.email); c.notify('Entraste con la cuenta de prueba de ' + d.nombre + (d.nivel === 'facultad' ? ' (estudiante de FADU)' : ' (secundaria)')); }
+  function crear() {
+    var em = L.email.trim();
+    c.up(function (p) { return { screen: 'registro', reg: Object.assign({}, p.reg, { step: 1, d: Object.assign({}, p.reg.d, { email: EMAIL_RE.test(em) ? em : p.reg.d.email }), touched: {}, tried: {} }) }; });
+  }
+  return html`<div className="screen" style=${{ background: '#1f2449', color: '#d66fa9' }}>
+    <div className="scroll">
+      <div style=${{ position: 'relative', minHeight: '100%', display: 'flex', flexDirection: 'column', padding: '14px 26px 28px' }}>
+        <div aria-hidden="true" style=${{ position: 'absolute', top: 0, bottom: 0, left: 14, borderLeft: '1px dashed rgba(214,111,169,.7)' }}></div>
+        <div aria-hidden="true" style=${{ position: 'absolute', top: 0, bottom: 0, right: 14, borderLeft: '1px dashed rgba(214,111,169,.7)' }}></div>
+        <div className="row" style=${{ justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style=${{ fontSize: 9, letterSpacing: '.06em', fontWeight: 500 }}>/ESTUDIÁ DISEÑO</span>
+          <button type="button" className="help-pill" onClick=${function () { c.up({ sheet: 'ayuda' }); }}>${I('help', 14, { sw: 2.2 })} Cómo funciona</button>
+        </div>
+        <div aria-hidden="true" style=${{ position: 'relative', height: 150, marginTop: 16 }}>
+          <div className="halftone" style=${{ position: 'absolute', top: 0, left: 0, width: 110, height: 100, opacity: .8 }}></div>
+          <div className="halftone" style=${{ position: 'absolute', top: 30, left: 56, width: 110, height: 110, borderRadius: '50%', opacity: .7 }}></div>
+          <div style=${{ position: 'absolute', top: 70, right: 30, width: 70, height: 40, background: '#93ab6a', opacity: .6 }}></div>
+          <div className="grid-rosa" style=${{ position: 'absolute', top: 10, right: 0, width: 120, height: 90 }}></div>
+        </div>
+        <div className="row" style=${{ gap: 12, marginTop: 8 }}>${Asterisco(34, '#d66fa9', 2.4)}</div>
+        <h1 style=${{ margin: '12px 0 0', fontSize: 44, lineHeight: .96, fontWeight: 800, letterSpacing: '-.01em' }}>DISEÑA LO QUE VIENE</h1>
+        <p style=${{ margin: '10px 0 0', fontSize: 13, letterSpacing: '.04em', textTransform: 'uppercase' }}>El futuro no se dibuja, se proyecta</p>
+
+        <form noValidate onSubmit=${submit} style=${{ marginTop: 26, display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <span className="label" style=${{ color: '#fff' }}>Iniciá sesión</span>
+          ${L.error === 'noexiste' ? html`<div className="alert info fade-in" role="alert">${I('info', 18)}<span style=${{ flex: 1 }}><strong>No hay una cuenta con ese email.</strong> ¿Es tu primera vez? Creá tu perfil en 3 pasos.
+            <br /><button type="button" className="btn-link" style=${{ paddingLeft: 0 }} onClick=${crear}>Crear cuenta con este email</button></span></div>` : null}
+          ${L.error === 'pass' ? html`<div className="alert info fade-in" role="alert">${I('alert', 18)}<span><strong>La contraseña no coincide.</strong> Revisá mayúsculas y acentos. Si es la cuenta de prueba, es <strong>diseño123</strong>.</span></div>` : null}
+          <div className="field">
+            <label htmlFor="l-email" style=${{ color: '#fff' }}>Email</label>
+            <input id="l-email" className=${'input dark' + (eErr ? ' err' : '')} type="email" autoComplete="email" inputMode="email" placeholder="nombre@mail.com" value=${L.email}
+              aria-invalid=${!!eErr} onChange=${function (e) { c.sub('login', { email: e.target.value, error: null }); }} onBlur=${function () { if (L.email) c.sub('login', { touched: Object.assign({}, L.touched, { email: true }) }); }} />
+            ${eErr ? html`<span className="msg" style=${{ color: '#fbce00' }} role="alert">${I('alert', 14, { sw: 2.6 })}<span>${eErr}</span></span>` : null}
+          </div>
+          <div className="field">
+            <label htmlFor="l-pass" style=${{ color: '#fff' }}>Contraseña</label>
+            <div className="pass">
+              <input id="l-pass" className=${'input dark' + (pErr ? ' err' : '')} type=${L.show ? 'text' : 'password'} autoComplete="current-password" value=${L.pass}
+                onChange=${function (e) { c.sub('login', { pass: e.target.value, error: null }); }} />
+              <button type="button" className="icon-btn" style=${{ color: '#d66fa9' }} aria-label=${L.show ? 'Ocultar contraseña' : 'Mostrar contraseña'} aria-pressed=${L.show} onClick=${function () { c.sub('login', { show: !L.show }); }}>${I(L.show ? 'eyeoff' : 'eye', 20, { sw: 1.8 })}</button>
+            </div>
+            ${pErr ? html`<span className="msg" style=${{ color: '#fbce00' }} role="alert">${I('alert', 14, { sw: 2.6 })}<span>${pErr}</span></span>` : null}
+          </div>
+          <button type="submit" className="btn btn-rosa btn-block" style=${{ minHeight: 54, fontSize: 15, justifyContent: 'space-between' }}>Ingresar ${I('arrow', 18, { sw: 2.2 })}</button>
+        </form>
+
+        <div style=${{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 14 }}>
+          <button type="button" className="btn btn-ghost on-dark btn-block" onClick=${crear}>No tengo cuenta · Crear perfil</button>
+          <span className="label" style=${{ color: '#fff', textAlign: 'center', marginTop: 6, fontSize: 10 }}>Probar sin registrarte</span>
+          <div className="grid2" style=${{ gap: 8 }}>
+            <button type="button" className="btn btn-ghost on-dark" style=${{ fontSize: 11, minHeight: 44, padding: '0 8px' }} onClick=${function () { demo(DEMO); }}>Secundaria</button>
+            <button type="button" className="btn btn-ghost on-dark" style=${{ fontSize: 11, minHeight: 44, padding: '0 8px' }} onClick=${function () { demo(DEMO2); }}>Facultad</button>
+          </div>
+        </div>
+
+        <footer className="login-foot">
+          <span>Ministerio de Educación<br />× Grupo EDISUR</span>
+          <span style=${{ textAlign: 'right' }}>Una campaña de<br /><strong>Tinta Brava</strong></span>
+        </footer>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ---------------- REGISTRO (3 pasos) ---------------- */
+function REG_VACIO() { return { nombre: '', apellido: '', email: '', pass: '', prov: '', nivel: '', anio: '5° año', facu: '', carrera: '', anioCar: '1° año', edad: '', intereses: [] }; }
+function regErrors(d, users) {
+  var e = {};
+  if (!d.nombre.trim()) e.nombre = 'Escribí tu nombre';
+  var ee = emailError(d.email); if (ee) e.email = ee;
+  else if (users[d.email.trim().toLowerCase()]) e.email = 'Ya hay una cuenta con este email';
+  if (d.pass.length < 6) e.pass = d.pass ? 'Tiene que tener al menos 6 caracteres (te faltan ' + (6 - d.pass.length) + ')' : 'Elegí una contraseña de al menos 6 caracteres';
+  if (!d.prov) e.prov = 'Elegí tu provincia para mostrarte facultades cerca';
+  if (!d.nivel) e.nivel = 'Contanos en qué etapa estás';
+  if (d.nivel === 'facultad' && !d.facu) e.facu = 'Elegí tu facultad';
+  if (d.nivel === 'facultad' && !d.carrera) e.carrera = 'Elegí tu carrera';
+  var n = parseInt(d.edad, 10);
+  if (d.edad !== '' && (isNaN(n) || n < 12 || n > 99)) e.edad = 'Tiene que ser un número entre 12 y 99';
+  if (!d.intereses.length) e.intereses = 'Elegí al menos una';
+  return e;
+}
+var STEP_FIELDS = { 1: ['nombre', 'email', 'pass'], 2: ['nivel', 'prov', 'facu', 'carrera', 'edad'], 3: ['intereses'] };
+function RegistroScreen(c) {
+  var R = c.S.reg, d = R.d, errs = regErrors(d, c.S.users);
+  function show(k) { return (R.touched[k] || R.tried[R.step]) && errs[k] ? errs[k] : ''; }
+  function set(k, v) { var nd = Object.assign({}, d); nd[k] = v; c.sub('reg', { d: nd }); }
+  function touch(k) { var t = Object.assign({}, R.touched); t[k] = true; c.sub('reg', { touched: t }); }
+  var stepOk = STEP_FIELDS[R.step].every(function (k) { return !errs[k]; });
+  function next() {
+    if (!stepOk) { var tr = Object.assign({}, R.tried); tr[R.step] = true; c.sub('reg', { tried: tr }); c.notify('Revisá los campos marcados para seguir', null, true); return; }
+    if (R.step < 3) { c.sub('reg', { step: R.step + 1 }); return; }
+    var em = d.email.trim().toLowerCase();
+    var u = { nombre: d.nombre.trim(), apellido: d.apellido.trim(), email: em, pass: d.pass, prov: d.prov, nivel: d.nivel, anio: d.nivel === 'secundaria' ? d.anio : '', facu: d.nivel === 'facultad' ? d.facu : '', carrera: d.nivel === 'facultad' ? d.carrera : '', anioCar: d.nivel === 'facultad' ? d.anioCar : '', edad: d.edad, intereses: d.intereses.slice(), avatar: null, saved: { posts: [], facs: [], materias: [], becas: [] }, likes: [] };
+    c.up(function (p) { var users = Object.assign({}, p.users); users[em] = u; return { users: users, reg: { step: 1, d: REG_VACIO(), touched: {}, tried: {}, show: false } }; });
+    c.login(em);
+    c.notify('¡Listo, ' + u.nombre + '! Tu perfil está creado');
+  }
+  function prev() { if (R.step === 1) c.up({ screen: 'login' }); else c.sub('reg', { step: R.step - 1 }); }
+  var titles = { 1: ['Creá tu cuenta', 'Con esto vas a poder guardar facultades, materias y trabajos.'], 2: ['¿Dónde estás?', 'Contanos si estás terminando la secundaria o si ya estudiás en una facultad.'], 3: ['¿Qué te interesa?', 'Elegí todas las que quieras. Lo podés cambiar después.'] };
+  var emailExiste = errs.email === 'Ya hay una cuenta con este email' && show('email');
+
+  return html`<div className="screen">
+    <div className="hdr" style=${{ paddingBottom: 20 }}>
+      <div className="row" style=${{ justifyContent: 'space-between' }}>
+        <button type="button" className="icon-btn plain" style=${{ color: '#d66fa9', marginLeft: -10 }} aria-label=${R.step === 1 ? 'Volver a iniciar sesión' : 'Volver al paso anterior'} onClick=${prev}>${I('back', 22)}</button>
+        <span className="label" aria-live="polite">Paso ${R.step} de 3</span>
+      </div>
+      <div className="steps" aria-hidden="true" style=${{ marginTop: 10 }}>${[1, 2, 3].map(function (i) { return html`<span key=${i} className=${i <= R.step ? 'done' : ''}></span>`; })}</div>
+      <h1>${titles[R.step][0].toUpperCase()}</h1>
+      <p>${titles[R.step][1]}</p>
+    </div>
+    <div className="scroll">
+      <form noValidate className="pad stack" style=${{ gap: 16 }} onSubmit=${function (e) { e.preventDefault(); next(); }}>
+        ${R.step === 1 ? html`
+          <div className="grid2">
+            <div className="field"><label htmlFor="r-nombre">Nombre *</label>
+              <input id="r-nombre" className=${'input' + (show('nombre') ? ' err' : '')} autoComplete="given-name" value=${d.nombre} aria-invalid=${!!show('nombre')} onChange=${function (e) { set('nombre', e.target.value); }} onBlur=${function () { touch('nombre'); }} />
+              ${Msg(show('nombre'))}</div>
+            <div className="field"><label htmlFor="r-apellido">Apellido</label>
+              <input id="r-apellido" className="input" autoComplete="family-name" value=${d.apellido} onChange=${function (e) { set('apellido', e.target.value); }} /></div>
+          </div>
+          <div className="field"><label htmlFor="r-email">Email *</label>
+            <input id="r-email" className=${'input' + (show('email') ? ' err' : '')} type="email" inputMode="email" autoComplete="email" placeholder="nombre@mail.com" value=${d.email} aria-invalid=${!!show('email')} onChange=${function (e) { set('email', e.target.value); }} onBlur=${function () { touch('email'); }} />
+            ${Msg(show('email'))}
+            ${emailExiste ? html`<button type="button" className="btn-link" style=${{ alignSelf: 'flex-start', paddingLeft: 0 }} onClick=${function () { c.up(function (p) { return { screen: 'login', login: Object.assign({}, p.login, { email: d.email, error: null }) }; }); }}>Ingresar con ese email</button>` : null}
+            ${!errs.email && R.touched.email ? Msg('Email válido', 'ok') : null}</div>
+          <div className="field"><label htmlFor="r-pass">Contraseña *</label>
+            <div className="pass">
+              <input id="r-pass" className=${'input' + (show('pass') ? ' err' : '')} type=${R.show ? 'text' : 'password'} autoComplete="new-password" value=${d.pass} aria-describedby="r-pass-hint" onChange=${function (e) { set('pass', e.target.value); }} onBlur=${function () { touch('pass'); }} />
+              <button type="button" className="icon-btn" aria-label=${R.show ? 'Ocultar contraseña' : 'Mostrar contraseña'} aria-pressed=${R.show} onClick=${function () { c.sub('reg', { show: !R.show }); }}>${I(R.show ? 'eyeoff' : 'eye', 20, { sw: 1.8 })}</button>
+            </div>
+            ${show('pass') ? Msg(show('pass')) : html`<span id="r-pass-hint" className=${'hint' + (d.pass.length >= 6 ? ' msg ok' : '')}>${d.pass.length >= 6 ? html`${I('check', 13, { sw: 3 })} Contraseña segura` : 'Mínimo 6 caracteres.'}</span>`}</div>
+        ` : null}
+
+        ${R.step === 2 ? html`
+          <div className="field" role="radiogroup" aria-labelledby="r-nivel-l">
+            <span id="r-nivel-l" className="label">¿En qué etapa estás? *</span>
+            ${[['secundaria', 'Estoy en la secundaria', 'Quiero conocer carreras y facultades'], ['facultad', 'Ya estudio en una facultad', 'Quiero compartir mis trabajos y ver otras cursadas']].map(function (o) {
+              var on = d.nivel === o[0];
+              return html`<button key=${o[0]} type="button" role="radio" aria-checked=${on} className=${'opt' + (on ? ' on' : '') + (show('nivel') ? ' err' : '')} onClick=${function () { set('nivel', o[0]); touch('nivel'); }}>
+                <span className="dot" aria-hidden="true"></span>
+                <span className="stack" style=${{ gap: 2 }}><span style=${{ fontSize: 14, fontWeight: 800 }}>${o[1]}</span><span style=${{ fontSize: 12 }}>${o[2]}</span></span>
+              </button>`;
+            })}
+            ${Msg(show('nivel'))}
+          </div>
+          <div className="field" style=${{ background: '#fbce00', padding: 16, gap: 10 }}>
+            <label htmlFor="r-prov">¿De qué provincia sos? *</label>
+            <select id="r-prov" className=${'input' + (show('prov') ? ' err' : '')} style=${{ fontWeight: 600 }} value=${d.prov} onChange=${function (e) { set('prov', e.target.value); touch('prov'); }}>
+              <option value="" disabled>Elegí una provincia</option>
+              ${PROVS.map(function (p) { return html`<option key=${p.id} value=${p.id}>${p.nombre}</option>`; })}
+            </select>
+            ${Msg(show('prov'))}
+            ${d.prov ? html`<span className="muted fade-in">Encontramos <strong>${provById(d.prov).facs.length} ${provById(d.prov).facs.length === 1 ? 'facultad pública' : 'facultades públicas'}</strong> con diseño cerca tuyo.</span>` : null}
+          </div>
+          ${d.nivel === 'facultad' ? html`<div className="stack fade-in" style=${{ gap: 14 }}>
+            <div className="field"><label htmlFor="r-facu">¿En qué facultad? *</label>
+              <select id="r-facu" className=${'input' + (show('facu') ? ' err' : '')} value=${d.facu} onChange=${function (e) { var nd = Object.assign({}, d, { facu: e.target.value, carrera: '' }); c.sub('reg', { d: nd }); touch('facu'); }}>
+                <option value="" disabled>Elegí tu facultad</option>
+                ${FACS.map(function (f) { return html`<option key=${f.id} value=${f.id}>${f.sigla} · ${f.uni}</option>`; })}
+              </select>${Msg(show('facu'))}</div>
+            <div className="grid2">
+              <div className="field"><label htmlFor="r-car">Carrera *</label>
+                <select id="r-car" className=${'input' + (show('carrera') ? ' err' : '')} disabled=${!d.facu} value=${d.carrera} onChange=${function (e) { set('carrera', e.target.value); touch('carrera'); }}>
+                  <option value="" disabled>${d.facu ? 'Elegí' : 'Primero la facultad'}</option>
+                  ${(d.facu ? facById(d.facu).carreras : []).map(function (x) { return html`<option key=${x.sigla} value=${x.sigla}>${x.nombre}</option>`; })}
+                </select>${Msg(show('carrera'))}</div>
+              <div className="field"><label htmlFor="r-aniocar">Año de la carrera</label>
+                <select id="r-aniocar" className="input" value=${d.anioCar} onChange=${function (e) { set('anioCar', e.target.value); }}>
+                  ${ANIOS_CAR.map(function (a) { return html`<option key=${a} value=${a}>${a}</option>`; })}
+                </select></div>
+            </div>
+          </div>` : null}
+          <div className="grid2">
+            ${d.nivel === 'secundaria' ? html`<div className="field fade-in"><label htmlFor="r-anio">Año que cursás</label>
+              <select id="r-anio" className="input" value=${d.anio} onChange=${function (e) { set('anio', e.target.value); }}>
+                ${ANIOS.map(function (a) { return html`<option key=${a} value=${a}>${a}</option>`; })}
+              </select></div>` : null}
+            <div className="field"><label htmlFor="r-edad">Edad</label>
+              <input id="r-edad" className=${'input' + (show('edad') ? ' err' : '')} type="number" inputMode="numeric" min="12" max="99" value=${d.edad} onChange=${function (e) { set('edad', e.target.value); }} onBlur=${function () { touch('edad'); }} />
+              ${Msg(show('edad'))}</div>
+          </div>
+        ` : null}
+
+        ${R.step === 3 ? html`
+          <div className="row" style=${{ justifyContent: 'space-between' }}>
+            <span className="label">Elegí una o más</span>
+            <span className="label" aria-live="polite">${d.intereses.length ? d.intereses.length + (d.intereses.length === 1 ? ' elegida' : ' elegidas') : 'Ninguna'}</span>
+          </div>
+          <div className="chips wrap">
+            ${INTERESES.map(function (it) {
+              var on = d.intereses.indexOf(it[0]) >= 0;
+              return html`<button key=${it[0]} type="button" className=${'chip big' + (on ? ' on' : '')} aria-pressed=${on} onClick=${function () {
+                var a = d.intereses.slice(); if (on) a.splice(a.indexOf(it[0]), 1); else a.push(it[0]); set('intereses', a); touch('intereses');
+              }}>${on ? I('check', 13, { sw: 3.2 }) : null}${it[1]}</button>`;
+            })}
+          </div>
+          ${Msg(show('intereses'))}
+          <div className="alert info">${I('bulb', 18)}<span>Con esto ordenamos los trabajos de Inicio y te sugerimos carreras.</span></div>
+        ` : null}
+
+        <div className="row" style=${{ gap: 10, marginTop: 8 }}>
+          <button type="button" className="btn btn-ghost" onClick=${prev}>${R.step === 1 ? 'Cancelar' : 'Atrás'}</button>
+          <button type="submit" className="btn btn-navy" style=${{ flex: 1 }}>${R.step === 3 ? 'Crear mi perfil' : 'Siguiente'} ${I('arrow', 16, { sw: 2.4 })}</button>
+        </div>
+        ${R.step === 1 ? html`<button type="button" className="btn-link" style=${{ alignSelf: 'center' }} onClick=${function () { c.up({ screen: 'login' }); }}>Ya tengo cuenta · Ingresar</button>` : null}
+      </form>
+    </div>
+  </div>`;
+}
+
+/* ---------------- INICIO ---------------- */
+function InicioScreen(c) {
+  var S = c.S, F = S.feed, u = c.user;
+  var q = norm(F.q.trim());
+  var posts = c.allPosts.filter(function (p) {
+    var okQ = !q || norm([p.titulo, p.desc, p.autor, p.materia, p.carrera, facById(p.fac).sigla].join(' ')).indexOf(q) >= 0;
+    return (F.fac === 'todas' || p.fac === F.fac) && (F.car === 'todas' || p.ck === F.car) && okQ;
+  });
+  var mapInt = { DG: 'dg', ARQ: 'arq', DI: 'di' };
+  var prefs = (u.intereses || []).map(function (k) { return mapInt[k]; }).filter(Boolean);
+  if (F.car === 'todas' && prefs.length) posts = posts.slice().sort(function (a, b) { return (prefs.indexOf(b.ck) >= 0) - (prefs.indexOf(a.ck) >= 0); });
+  var facN = F.fac === 'todas' ? '' : (facById(F.fac) || {}).sigla;
+  var facsConPosts = FACS.filter(function (f) { return c.allPosts.some(function (p) { return p.fac === f.id; }); });
+  var carN = { todas: '', dg: 'Gráfico', arq: 'Arquitectura', di: 'Industrial', ux: 'UX/UI', otras: 'Otras carreras' }[F.car];
+  var partes = [facN, carN, q ? '"' + F.q.trim() + '"' : ''].filter(Boolean);
+  var grupos = [{ key: 'fac', label: 'Facultad', def: 'todas', opts: [['todas', 'Todas']].concat(facsConPosts.map(function (f) { return [f.id, f.sigla]; })) },
+    { key: 'car', label: 'Carrera', def: 'todas', opts: [['todas', 'Todas'], ['dg', 'Gráfico'], ['arq', 'Arquitectura'], ['di', 'Industrial'], ['ux', 'UX/UI'], ['otras', 'Otras']] }];
+  function limpiar() { var antes = Object.assign({}, F); c.sub('feed', { fac: 'todas', car: 'todas', q: '', buscando: false }); c.notify('Filtros borrados', function () { c.sub('feed', antes); }); }
+  function chip(key, val, label) {
+    var on = F[key] === val;
+    return html`<button key=${val} type="button" className=${'chip' + (on ? ' on' : '')} aria-pressed=${on} onClick=${function () { var o = {}; o[key] = val; c.sub('feed', o); }}>${on && val !== 'todas' ? I('check', 12, { sw: 3.2 }) : null}${label}</button>`;
+  }
+  return html`<div className="screen"><div className="scroll">
+    <div className="hdr">
+      <div className="halftone deco" aria-hidden="true" style=${{ top: -20, right: 70, width: 80, height: 80, borderRadius: '50%', opacity: .55 }}></div>
+      <div className="row" style=${{ justifyContent: 'space-between' }}>
+        <div className="row" style=${{ gap: 8 }}>${Asterisco(20, '#d66fa9', 3)}<span style=${{ fontSize: 12, fontWeight: 800, letterSpacing: '.04em', lineHeight: 1.05 }}>DISEÑA LO<br />QUE VIENE</span></div>
+        <button type="button" className=${'icon-btn' + (F.buscando ? ' on' : '')} style=${F.buscando ? { background: '#d66fa9', borderColor: '#d66fa9', color: '#1f2449' } : null} aria-expanded=${F.buscando} aria-label=${F.buscando ? 'Cerrar búsqueda' : 'Buscar trabajos'}
+          onClick=${function () { c.sub('feed', { buscando: !F.buscando, q: F.buscando ? '' : F.q }); }}>${I(F.buscando ? 'x' : 'search', F.buscando ? 16 : 18, { sw: 2.4 })}</button>
+      </div>
+      ${F.buscando ? html`<div className="field fade-in" style=${{ marginTop: 14 }}>
+          <label htmlFor="h-q" style=${{ color: '#fff' }}>Buscar trabajos</label>
+          <input id="h-q" className="input dark" autoFocus placeholder="Ej: afiche, silla, tipografía, Martina" value=${F.q} onChange=${function (e) { c.sub('feed', { q: e.target.value }); }} />
+        </div>` : html`<div>
+          <h1 style=${{ fontSize: 24, marginTop: 12 }}>HOLA, ${u.nombre.toUpperCase()}</h1>
+          <p>${u.nivel === 'facultad' ? 'Mirá qué se cursa en otras facultades y compartí lo que hacés vos.' : 'Esto se está proyectando hoy en facultades públicas.'}</p>
+        </div>`}
+    </div>
+
+    ${FiltroBar(c, 'feed', grupos)}
+
+    <div className="pad stack" style=${{ gap: 16, paddingTop: 12 }}>
+      ${S.tip ? html`<div className="alert info fade-in" role="note" style=${{ flexDirection: 'column', gap: 8 }}>
+        <div className="row" style=${{ gap: 10, alignItems: 'flex-start' }}>${I('bulb', 20)}<span><strong>Tip:</strong> tocá la materia de cada trabajo para ver qué se hace en esa cursada. Guardá lo que te guste con el marcador y lo encontrás en tu Perfil.</span></div>
+        <button type="button" className="btn btn-navy" style=${{ alignSelf: 'flex-end', minHeight: 36, fontSize: 11, color: '#fbce00' }} onClick=${function () { c.up({ tip: false }); }}>Entendido</button>
+      </div>` : null}
+      <div className="row" style=${{ justifyContent: 'space-between', gap: 10, minHeight: 36 }}>
+        <span className="label" aria-live="polite" style=${{ lineHeight: 1.35 }}>${posts.length} ${posts.length === 1 ? 'trabajo' : 'trabajos'} · ${partes.length ? partes.join(' · ') : (prefs.length ? 'Primero lo que te interesa' : 'Todas las facultades')}</span>
+        ${partes.length ? html`<button type="button" className="btn-link" onClick=${limpiar}>Limpiar filtros</button>` : null}
+      </div>
+      ${posts.length === 0 ? html`<div className="empty">${Asterisco(34, '#d66fa9', 2.4)}<span><strong>Todavía no hay trabajos acá</strong><br />${F.car === 'ux' && !q ? 'Todavía no hay trabajos de UX/UI cargados. Mientras tanto, mirá Gráfico.' : 'No hay resultados con estos filtros. Probá sacando alguno.'}</span>
+        <button type="button" className="btn btn-navy" onClick=${limpiar}>Ver todos los trabajos</button></div>` : null}
+      ${posts.map(function (p) { return PostCard(c, p); })}
+    </div>
+  </div>
+  <button type="button" className="fab" onClick=${function () { c.openSubir(); }} aria-label="Subir un trabajo">${I('plus', 20, { sw: 2.8 })}<span>SUBIR TRABAJO</span></button>
+  ${FiltroSheet(c, 'feed', grupos, posts.length, ['trabajo', 'trabajos'])}
+  </div>`;
+}
+function PostCard(c, p) {
+  var u = c.user, f = facById(p.fac), col = TILE[p.color] || TILE.pink;
+  var liked = u.likes.indexOf(p.id) >= 0, saved = c.isSaved('posts', p.id);
+  var mio = p.autorEmail && p.autorEmail === c.S.email;
+  var autorU = p.autorEmail ? c.S.users[p.autorEmail] : null;
+  var autorAv = autorU ? Avatar(autorU, 40) : html`<img className="avatar" src=${p.av} alt="" style=${{ width: 40, height: 40 }} />`;
+  var n = p.fotos ? p.fotos.length : 0;
+  return html`<article key=${p.id} className="card" aria-label=${p.titulo + ', de ' + p.autor}>
+    <div className="row" style=${{ gap: 10, padding: '10px 12px' }}>
+      ${autorAv}
+      <div className="stack" style=${{ flex: 1, minWidth: 0, gap: 1 }}><span style=${{ fontSize: 13, fontWeight: 700 }}>${p.autor}${mio ? ' (vos)' : ''}</span><span style=${{ fontSize: 11 }}>${f.sigla} · ${f.uni} · ${p.carrera}</span></div>
+      <span className="tag">${p.sigla}</span>
+    </div>
+    ${n ? html`<div className="post-tile" style=${{ background: '#1f2449', height: 'auto' }}>
+        <div className="carousel" tabIndex="0" aria-label=${'Fotos del trabajo, ' + n + (n === 1 ? ' foto' : ' fotos')}>
+          ${p.fotos.map(function (src, i) { return html`<button key=${i} type="button" className="slide" aria-label=${'Ampliar foto ' + (i + 1) + ' de ' + n}
+            onClick=${function () { c.up({ zoom: { tiles: p.fotos.map(function (x, j) { return { img: x, titulo: p.titulo, tp: 'Foto ' + (j + 1) + ' de ' + n }; }), i: i } }); }}><img src=${src} alt=${'Foto ' + (i + 1) + ' de ' + p.titulo} /></button>`; })}
+        </div>
+        ${n > 1 ? html`<span className="count">${n} FOTOS · DESLIZÁ →</span>` : null}
+      </div>`
+    : html`<div className="post-tile" style=${{ background: col.bg, color: col.fg }}>
+      <div className="grid-navy" aria-hidden="true" style=${{ position: 'absolute', inset: 0, opacity: .8 }}></div>
+      <div className="halftone" aria-hidden="true" style=${{ position: 'absolute', width: 90, height: 90, borderRadius: '50%', right: 34, top: 30, opacity: .8 }}></div>
+      <span className="mark" aria-hidden="true">${p.mark}</span>
+      <span className="cap">[FOTO DEL TRABAJO]</span>
+    </div>`}
+    <div className="stack" style=${{ padding: '10px 12px 4px', gap: 6 }}>
+      <span style=${{ fontSize: 15, fontWeight: 800, lineHeight: 1.2 }}>${p.titulo}</span>
+      <p style=${{ margin: 0, fontSize: 13, lineHeight: 1.45 }}>${p.desc}</p>
+      <button type="button" className="matlink" onClick=${function () { c.push({ type: 'materia', fac: p.fac, nombre: p.materia, catedra: p.catedra, car: p.sigla }); }}>
+        <span className="stack" style=${{ gap: 1 }}><span style=${{ fontSize: 10, fontWeight: 600, letterSpacing: '.06em' }}>VER LA MATERIA · CÁTEDRA</span><span style=${{ fontSize: 12, fontWeight: 700 }}>${p.materia} · ${p.catedra}</span></span>
+        ${I('arrow', 15, { sw: 2.4, color: '#d66fa9' })}
+      </button>
+      <div className="row" style=${{ gap: 4, marginLeft: -10 }}>
+        <button type="button" className=${'act' + (liked ? ' liked' : '')} aria-pressed=${liked} aria-label=${liked ? 'Quitar me gusta' : 'Me gusta'} onClick=${function () {
+          c.updUser(function (x) { var i = x.likes.indexOf(p.id); if (i >= 0) x.likes.splice(i, 1); else x.likes.push(p.id); });
+        }}>${I('heart', 22, { sw: 1.8, fill: liked ? '#d66fa9' : 'none' })}${(p.likes || 0) + (liked ? 1 : 0)}</button>
+        <button type="button" className=${'act' + (saved ? ' saved' : '')} aria-pressed=${saved} aria-label=${saved ? 'Quitar de guardados' : 'Guardar trabajo'} onClick=${function () {
+          c.toggleIn('posts', p.id, ['Guardado en tu perfil', 'Quitaste el trabajo de tus guardados']);
+        }}>${I('bookmark', 20, { sw: 1.8, fill: saved ? '#1f2449' : 'none' })}${saved ? 'Guardado' : 'Guardar'}</button>
+        ${mio ? html`<button type="button" className="act" style=${{ marginLeft: 'auto', color: '#8a1f55' }} onClick=${function () { c.up({ borrar: p.id }); }}>${I('trash', 18, { sw: 1.9 })}Eliminar</button>` : null}
+      </div>
+    </div>
+  </article>`;
+}
+
+/* ---------------- FACULTADES (lista) ---------------- */
+function FacultadesScreen(c) {
+  var S = c.S, Lq = S.lista, u = c.user;
+  var prov = provById(u.prov);
+  var q = norm(Lq.q.trim());
+  var lista = FACS.filter(function (f) {
+    var okZ = q || Lq.zona === 'pais' || prov.facs.indexOf(f.id) >= 0;
+    var okC = Lq.car === 'todas' || f.carreras.some(function (x) { return x.k === Lq.car; });
+    var hay = [f.sigla, f.nombre, f.uni, f.ciudad].concat(f.carreras.map(function (x) { return x.nombre + ' ' + x.sigla; })).join(' ');
+    return okZ && okC && (!q || norm(hay).indexOf(q) >= 0);
+  });
+  var carTxt = { todas: 'Todas las carreras', arq: 'Arquitectura', dg: 'Gráfico / Visual', di: 'Industrial' }[Lq.car];
+  var filtrado = Lq.zona !== 'cerca' || Lq.car !== 'todas' || !!q;
+  var grupos = [{ key: 'zona', label: 'Zona', def: 'cerca', opts: [['cerca', 'Cerca tuyo · ' + prov.nombre], ['pais', 'Todo el país']] },
+    { key: 'car', label: 'Carrera', def: 'todas', opts: [['todas', 'Todas'], ['arq', 'Arquitectura'], ['dg', 'Gráfico / Visual'], ['di', 'Industrial']] }];
+  function limpiar() { var antes = Object.assign({}, Lq); c.sub('lista', { zona: 'pais', car: 'todas', q: '' }); c.notify('Filtros borrados: ves todas las facultades', function () { c.sub('lista', antes); }); }
+  function chip(key, val, label) {
+    var on = Lq[key] === val;
+    return html`<button key=${val} type="button" className=${'chip' + (on ? ' on' : '')} aria-pressed=${on} onClick=${function () { var o = {}; o[key] = val; c.sub('lista', o); }}>${on ? I('check', 12, { sw: 3.2 }) : null}${label}</button>`;
+  }
+  return html`<div className="screen"><div className="scroll">
+    <div className="hdr" style=${{ paddingBottom: 20 }}>
+      <div className="grid-rosa deco" aria-hidden="true" style=${{ right: 0, top: 0, width: 110, height: 70 }}></div>
+      <div className="halftone deco" aria-hidden="true" style=${{ top: -14, right: 26, width: 56, height: 56, borderRadius: '50%', opacity: .6 }}></div>
+      <h1 style=${{ fontSize: 28, marginTop: 4 }}>ELEGÍ TU CAMINO</h1>
+      <div className="row" style=${{ marginTop: 14, gap: 8, border: '1px dashed #d66fa9', paddingLeft: 12, height: 48 }}>
+        ${I('search', 18, { color: '#d66fa9' })}
+        <label htmlFor="f-q" className="sr">Buscar facultad, ciudad o carrera</label>
+        <input id="f-q" placeholder="Buscá: Rosario, textil, UBA…" value=${Lq.q} onChange=${function (e) { c.sub('lista', { q: e.target.value }); }} style=${{ flex: 1, minWidth: 0, background: 'transparent', border: 'none', color: '#fff', fontSize: 15, outline: 'none' }} />
+        ${Lq.q ? html`<button type="button" className="icon-btn plain" style=${{ color: '#d66fa9' }} aria-label="Borrar búsqueda" onClick=${function () { c.sub('lista', { q: '' }); }}>${I('x', 14, { sw: 2.8 })}</button>` : null}
+      </div>
+    </div>
+    ${FiltroBar(c, 'lista', grupos)}
+    <div className="pad stack" style=${{ gap: 16 }}>
+      <div className="row" style=${{ justifyContent: 'space-between', gap: 10, minHeight: 36 }}>
+        <span className="label" aria-live="polite" style=${{ lineHeight: 1.35 }}>${lista.length} ${lista.length === 1 ? 'resultado' : 'resultados'} · ${q ? 'Todo el país' : (Lq.zona === 'pais' ? 'Todo el país' : prov.nombre)} · ${carTxt}${q ? ' · "' + Lq.q.trim() + '"' : ''}</span>
+        ${filtrado ? html`<button type="button" className="btn-link" onClick=${limpiar}>Limpiar filtros</button>` : null}
+      </div>
+      ${lista.length === 0 ? html`<div className="empty">${I('search', 34, { color: '#d66fa9', sw: 1.8 })}
+        <span><strong>No encontramos facultades</strong><br />${q ? 'No hay resultados para "' + Lq.q.trim() + '". Revisá cómo está escrito o probá otra palabra.' : 'No hay facultades de ' + carTxt + ' en ' + prov.nombre + '. Probá con "Todo el país".'}</span>
+        <button type="button" className="btn btn-navy" onClick=${limpiar}>Ver todas las facultades</button></div>` : null}
+      ${lista.map(function (f) {
+        var saved = c.isSaved('facs', f.id);
+        return html`<button key=${f.id} type="button" className="card" aria-label=${'Ver ' + f.nombre + ', ' + f.uni} onClick=${function () { c.push({ type: 'facultad', id: f.id }); }}>
+          <span className="duo" style=${{ display: 'flex', alignItems: 'flex-end', height: 112, width: '100%', padding: '10px 12px', background: f.color }}>
+            <img src=${f.img} alt="" loading="lazy" />
+            <span className="over" style=${{ fontSize: 26, fontWeight: 900, letterSpacing: '.02em', lineHeight: 1, padding: '4px 10px', background: '#1f2449', color: f.color }}>${f.sigla}</span>
+            <span className="over" style=${{ position: 'absolute', top: 12, right: 12, color: '#fff' }}>${saved ? I('bookmark', 20, { fill: '#fbce00', color: '#fbce00' }) : I('arrow', 20)}</span>
+          </span>
+          <span className="stack" style=${{ padding: 12, gap: 8, width: '100%' }}>
+            <span className="stack" style=${{ gap: 3 }}><span style=${{ fontSize: 15, fontWeight: 700, lineHeight: 1.25 }}>${f.nombre}</span><span style=${{ fontSize: 12 }}>${f.ciudad} · ${f.uni}</span></span>
+            <span className="row" style=${{ flexWrap: 'wrap', gap: 6 }}>${f.carreras.map(function (x) { return html`<span key=${x.sigla} className="tag" style=${{ fontSize: 11, padding: '4px 8px' }}>${x.sigla}</span>`; })}</span>
+            <span className="row dashed-top" style=${{ gap: 14, paddingTop: 10, fontSize: 11, fontWeight: 600 }}>
+              <span className="row" style=${{ gap: 5 }}><span style=${{ width: 8, height: 8, background: '#93ab6a' }}></span>Gratuita</span>
+              <span className="row" style=${{ gap: 5 }}><span style=${{ width: 8, height: 8, background: '#fbce00' }}></span>${f.becas.length} becas</span>
+            </span>
+          </span>
+        </button>`;
+      })}
+      ${AvisoBecas(c)}
+    </div>
+  </div>
+  ${FiltroSheet(c, 'lista', grupos, lista.length, ['facultad', 'facultades'])}
+  </div>`;
+}
+function AvisoBecas(c) {
+  var on = c.S.aviso;
+  return html`<div style=${{ position: 'relative', background: '#1f2449', color: '#d66fa9', padding: 18, display: 'flex', flexDirection: 'column', gap: 8, overflow: 'hidden' }}>
+    <div className="grid-rosa" aria-hidden="true" style=${{ position: 'absolute', inset: 0, opacity: .7 }}></div>
+    <span style=${{ position: 'relative' }}>${Asterisco(22, '#d66fa9', 3)}</span>
+    <span style=${{ position: 'relative', fontSize: 18, fontWeight: 800, lineHeight: 1.1 }}>INSCRIBITE AL PROGRAMA DE BECAS 2027</span>
+    <span style=${{ position: 'relative', fontSize: 12, color: '#fff' }}>Gobierno de la Ciudad × EDISUR</span>
+    <button type="button" className=${'btn ' + (on ? 'btn-rosa' : 'btn-ghost on-dark')} style=${{ position: 'relative', alignSelf: 'flex-start', fontSize: 12 }} aria-pressed=${on} onClick=${function () {
+      c.up({ aviso: !on });
+      c.notify(on ? 'Cancelaste el aviso de becas' : 'Listo, te avisamos cuando abra la inscripción', on ? null : function () { c.up({ aviso: false }); });
+    }}>${on ? html`${I('check', 14, { sw: 3 })} Te avisamos cuando abra` : 'Avisarme cuando abra'}</button>
+  </div>`;
+}
+
+/* ---------------- FACULTAD (detalle) ---------------- */
+function FacultadScreen(c, v) {
+  var f = facById(v.id), D = c.S.det, saved = c.isSaved('facs', f.id);
+  var fills = [{ bg: '#1f2449', fg: '#d66fa9', dark: true }, { bg: '#fbce00', fg: '#1f2449' }, { bg: '#ffffff', fg: '#1f2449', border: '1px dashed #1f2449' }, { bg: '#93ab6a', fg: '#1f2449' }];
+  var tabs = [['carreras', 'CARRERAS'], ['catedras', 'CÁTEDRAS'], ['becas', 'BECAS'], ['datos', 'DATOS']];
+  return html`<div className="screen"><div className="scroll">
+    <div style=${{ position: 'relative', padding: '10px 22px 16px', overflow: 'hidden', background: f.color, color: '#1f2449' }}>
+      <div className="grid-navy" aria-hidden="true" style=${{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 90 }}></div>
+      <div className="duo" style=${{ position: 'absolute', top: 12, right: 0, width: 140, height: 118, background: f.color, borderLeft: '1px dashed #1f2449', borderBottom: '1px dashed #1f2449' }}><img src=${f.img} alt=${'Edificio de ' + f.nombre + ', ' + f.uni} /></div>
+      <div className="halftone" aria-hidden="true" style=${{ position: 'absolute', top: 104, right: 92, width: 46, height: 46, borderRadius: '50%', opacity: .9 }}></div>
+      <div className="row" style=${{ position: 'relative', gap: 4 }}>
+        <button type="button" className="icon-btn plain" style=${{ marginLeft: -10 }} aria-label="Volver" onClick=${c.back}>${I('back', 22)}</button>
+        <nav aria-label="Ubicación" className="row" style=${{ gap: 6, fontSize: 11, fontWeight: 700 }}>
+          <button type="button" className="btn-link" style=${{ padding: 0, textTransform: 'none', fontSize: 11 }} onClick=${c.back}>Facultades</button><span aria-hidden="true">›</span><span aria-current="page">${f.sigla}</span>
+        </nav>
+      </div>
+      <button type="button" className="icon-btn plain bm" style=${{ position: 'absolute', top: 14, right: 160, zIndex: 2, color: '#1f2449' }} aria-pressed=${saved} aria-label=${saved ? 'Quitar de guardadas' : 'Guardar facultad'}
+        onClick=${function () { c.toggleIn('facs', f.id, [f.sigla + ' se guardó en tu perfil', f.sigla + ' se quitó de tus guardadas']); }}>${I('bookmark', 24, { sw: 2, fill: saved ? '#1f2449' : 'none' })}</button>
+      <h1 style=${{ position: 'relative', margin: '6px 0 0', fontSize: f.sigla.length > 5 ? 38 : 48, fontWeight: 900, lineHeight: .9 }}>${f.sigla}</h1>
+      <p style=${{ position: 'relative', margin: '8px 0 0', fontSize: 13, fontWeight: 600, maxWidth: 210, lineHeight: 1.3 }}>${f.nombre} · ${f.uni}</p>
+    </div>
+    <div className="kv3">
+      <div><span style=${{ fontSize: 10, fontWeight: 600, letterSpacing: '.06em' }}>GESTIÓN</span><span style=${{ fontSize: 14, fontWeight: 800 }}>Pública</span></div>
+      <div style=${{ paddingTop: 4, paddingBottom: 4 }}><span style=${{ fontSize: 10, fontWeight: 600, letterSpacing: '.06em', paddingTop: 6 }}>INGRESO</span>
+        <button type="button" aria-expanded=${D.info} aria-label=${(D.info ? 'Ocultar' : 'Ver') + ' qué es el ingreso ' + f.ingreso} onClick=${function () { c.sub('det', { info: !D.info }); }}
+          style=${{ display: 'flex', alignItems: 'center', gap: 6, minHeight: 32, padding: 0, background: 'transparent', border: 'none', color: '#1f2449', fontSize: 14, fontWeight: 800 }}>${f.ingreso} ${I('info', 16)}</button></div>
+      <div><span style=${{ fontSize: 10, fontWeight: 600, letterSpacing: '.06em' }}>ARANCEL</span><span style=${{ fontSize: 14, fontWeight: 800 }}>Gratuita</span></div>
+    </div>
+    ${D.info ? html`<div className="alert info fade-in" role="note" style=${{ borderBottom: '1px dashed #1f2449', padding: '14px 22px' }}>${I('info', 18)}<span style=${{ flex: 1 }}><strong>¿Qué es el ${f.ingreso === 'CBC' ? 'CBC' : 'curso de ingreso'}?</strong> ${f.ingresoInfo}</span>
+      <button type="button" className="icon-btn plain" style=${{ width: 32, height: 32 }} aria-label="Cerrar explicación" onClick=${function () { c.sub('det', { info: false }); }}>${I('x', 12, { sw: 3 })}</button></div>` : null}
+    <div className="tabs4" role="tablist" aria-label="Información de la facultad">
+      ${tabs.map(function (t) { var on = D.tab === t[0]; return html`<button key=${t[0]} type="button" role="tab" aria-selected=${on} className=${on ? 'on' : ''} onClick=${function () { c.sub('det', { tab: t[0] }); }}>${t[1]}</button>`; })}
+    </div>
+
+    ${D.tab === 'carreras' ? html`<div className="pad stack" style=${{ gap: 12 }}>
+      ${f.carreras.map(function (x) {
+        var open = D.openCar === x.sigla, plan = [], count = 0;
+        if (x.plan) plan = x.plan.map(function (y) {
+          var items = [];
+          y[2].forEach(function (m) { if (m.charAt(0) === '@') items = items.concat(CBC[m.slice(1)]); else items.push(m); });
+          var esCbc = /CBC/.test(y[0] + y[1]);
+          return { anio: y[0], ciclo: y[1], items: items.map(function (m) { var t = m.charAt(0) === '*' ? 'main' : m.charAt(0) === '+' ? 'extra' : ''; if (t !== 'extra') count++; var n = t ? m.slice(1) : m; return { t: t, n: n, link: !esCbc && (t !== 'extra' || SIN_CATEDRA_FIJA[n]), conHorario: !!horariosDe(f.id, n, x.sigla) }; }) };
+        });
+        return html`<div key=${x.sigla} className="stack">
+          <div className="row" style=${{ alignItems: 'stretch', border: '1px solid #1f2449' }}>
+            <div style=${{ width: 48, background: '#1f2449', color: '#d66fa9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><span className="vert">${x.sigla}</span></div>
+            <div className="stack" style=${{ padding: '12px 14px', gap: 4, flex: 1, minWidth: 0 }}>
+              <span style=${{ fontSize: 13, fontWeight: 800, letterSpacing: '.02em', textTransform: 'uppercase' }}>${x.nombre}</span>
+              <span style=${{ fontSize: 11 }}>Duración: ${x.dur}</span>
+              <span style=${{ fontSize: 11 }}>Materias: ${x.plan ? count + ' obligatorias + optativas' : X}</span>
+              ${x.plan ? html`<button type="button" className=${'btn ' + (open ? 'btn-navy' : 'btn-ghost')} style=${{ alignSelf: 'flex-start', marginTop: 6, minHeight: 38, fontSize: 11 }} aria-expanded=${open}
+                  onClick=${function () { c.sub('det', { openCar: open ? null : x.sigla }); }}>${open ? 'Cerrar plan ↑' : 'Ver plan y materias ↓'}</button>`
+                : html`<span style=${{ fontSize: 11, fontStyle: 'italic', marginTop: 4 }}>Plan de estudios a completar</span>`}
+            </div>
+          </div>
+          ${open ? html`<div className="fade-in" style=${{ border: '1px solid #1f2449', borderTop: '1px dashed #1f2449', padding: '6px 14px 14px' }}>
+            ${plan.map(function (y) { return html`<div key=${y.anio} className="stack dashed-bottom" style=${{ gap: 8, padding: '12px 0' }}>
+              <div className="row" style=${{ justifyContent: 'space-between', gap: 8 }}><span style=${{ fontSize: 12, fontWeight: 800, letterSpacing: '.06em', textTransform: 'uppercase' }}>${y.anio}</span><span style=${{ fontSize: 10, fontWeight: 600 }}>${y.ciclo}</span></div>
+              <div className="row" style=${{ flexWrap: 'wrap', gap: 6 }}>${y.items.map(function (m, i) {
+                if (!m.link) return html`<span key=${i} className=${'mat ' + m.t}>${m.n}</span>`;
+                if (SIN_CATEDRA_FIJA[m.n]) return html`<a key=${i} className=${'mat link ' + m.t} href="https://www.fadu.uba.ar/diseno-grafico/" target="_blank" rel="noopener">${m.n} ↗</a>`;
+                return html`<button key=${i} type="button" className=${'mat link ' + m.t} onClick=${function () { c.push({ type: 'materia', fac: f.id, nombre: m.n.replace('¹', ''), car: x.sigla }); }}>${m.n}${m.conHorario ? html` <span className="hora" aria-label="con horarios">${I('clock', 11, { sw: 2.4 })}</span>` : null}</button>`;
+              })}</div>
+            </div>`; })}
+            <span style=${{ display: 'block', fontSize: 10, lineHeight: 1.4, marginTop: 10 }}>Tocá una materia para ver qué se hace${x.sigla === 'DG' && f.id === 'fadu' ? ', sus cátedras y horarios (las que tienen reloj)' : ''}. El taller principal de cada año va resaltado. Fuente: fadu.uba.ar.</span>
+          </div>` : null}
+        </div>`;
+      })}
+    </div>` : null}
+
+    ${D.tab === 'catedras' ? CatedrasTab(c, f) : null}
+
+    ${D.tab === 'becas' ? html`<div className="pad stack" style=${{ gap: 12 }}>
+      ${f.becas.map(function (b, i) {
+        var key = f.id + '|' + b.nombre, on = c.isSaved('becas', key), fl = fills[i % fills.length];
+        return html`<div key=${key} className="stack" style=${{ gap: 8, padding: 16, background: fl.bg, color: fl.fg, border: fl.border || 'none' }}>
+          <div className="row" style=${{ justifyContent: 'space-between', alignItems: 'flex-start' }}><span style=${{ fontSize: 11, fontWeight: 700, letterSpacing: '.06em' }}>00${i + 1}</span><span style=${{ fontSize: 10, fontWeight: 700, letterSpacing: '.06em', border: '1px solid currentColor', padding: '2px 6px' }}>${b.tipo}</span></div>
+          <span style=${{ fontSize: 17, fontWeight: 800, lineHeight: 1.1 }}>${b.nombre}</span>
+          <span style=${{ fontSize: 12, lineHeight: 1.45 }}>${b.desc}</span>
+          <button type="button" aria-pressed=${on} className="btn" style=${{ alignSelf: 'flex-start', marginTop: 4, minHeight: 40, fontSize: 11,
+            background: on ? (fl.dark ? '#d66fa9' : '#1f2449') : 'transparent', color: on ? (fl.dark ? '#1f2449' : '#fff') : fl.fg, border: on ? 'none' : '1px dashed currentColor' }}
+            onClick=${function () { c.toggleIn('becas', key, ['Te avisamos por mail cuando abra ' + b.nombre, 'Ya no te vamos a avisar sobre ' + b.nombre]); }}>${on ? html`${I('check', 13, { sw: 3 })} Te avisamos` : 'Me interesa'}</button>
+        </div>`;
+      })}
+    </div>` : null}
+
+    ${D.tab === 'datos' ? html`<div className="pad stack">
+      ${[['Ingreso', f.ingreso === 'CBC' ? 'Ciclo Básico Común (CBC)' : 'Curso de ingreso'], ['Sede', f.sede], ['Cómo llegar', '[Líneas de colectivo / tren]'], ['Web', f.web]].map(function (kv) {
+        return html`<div key=${kv[0]} className="row dashed-bottom" style=${{ justifyContent: 'space-between', gap: 16, padding: '12px 0', fontSize: 13 }}><span style=${{ fontWeight: 600 }}>${kv[0]}</span><span style=${{ textAlign: 'right', userSelect: 'text' }}>${kv[1]}</span></div>`;
+      })}
+      <button type="button" className="btn btn-navy btn-block" style=${{ marginTop: 18 }} onClick=${function () { c.sub('feed', { fac: ['fadu', 'unlp', 'unmdp'].indexOf(f.id) >= 0 ? f.id : 'todas', car: 'todas', q: '' }); c.goTab('inicio'); }}>Ver trabajos de ${f.sigla}</button>
+    </div>` : null}
+  </div></div>`;
+}
+
+/* ---------------- MATERIA ---------------- */
+function MateriaScreen(c, v) {
+  var m = getMateria(v.fac, v.nombre, v.catedra || (horariosDe(v.fac, v.nombre, v.car) ? '' : 'Cátedra 1'), v.car), saved = c.isSaved('materias', m.key);
+  var trabajos = c.allPosts.filter(function (p) { return p.fac === v.fac && p.materia === v.nombre && (!v.catedra || p.catedra === v.catedra); });
+  var tiles = trabajos.map(function (p) { return { titulo: p.titulo, tp: p.autor, mark: p.mark || '', col: TILE[p.color] || TILE.navy, img: p.fotos && p.fotos[0] }; });
+  var relleno = [{ titulo: m.tps[0][0], tp: 'TP 01', mark: 'Aa', col: TILE.pink }, { titulo: m.tps[1][0], tp: 'TP 02', mark: '*', col: TILE.navy }, { titulo: m.tps[2][0], tp: 'TP 03', mark: 'R/', col: TILE.yellow }, { titulo: m.tps[2][0], tp: 'TP 03', mark: '01', col: TILE.green }];
+  tiles = tiles.concat(relleno).slice(0, 4);
+  var colores = ['#d66fa9', '#fbce00', '#93ab6a'];
+  var matTab = c.S.matTab || 'cursada';
+  return html`<div className="screen"><div className="scroll">
+    <div style=${{ position: 'relative', background: '#93ab6a', padding: '10px 22px 16px', overflow: 'hidden' }}>
+      <div className="grid-navy" aria-hidden="true" style=${{ position: 'absolute', right: 0, top: 0, width: 170, height: '100%' }}></div>
+      <div className="halftone" aria-hidden="true" style=${{ position: 'absolute', right: 26, top: 60, width: 72, height: 72, borderRadius: '50%', opacity: .85 }}></div>
+      <div className="row" style=${{ position: 'relative', gap: 4 }}>
+        <button type="button" className="icon-btn plain" style=${{ marginLeft: -10 }} aria-label="Volver" onClick=${c.back}>${I('back', 22)}</button>
+        <nav aria-label="Ubicación" className="row" style=${{ flex: 1, minWidth: 0, flexWrap: 'wrap', gap: 5, fontSize: 11, fontWeight: 700 }}>
+          <span>${m.facSigla}</span><span aria-hidden="true">›</span><span>${m.carrera || 'Carrera'}</span><span aria-hidden="true">›</span><span aria-current="page">${m.nombre}</span>
+        </nav>
+        <button type="button" className="icon-btn plain bm" style=${{ color: '#1f2449' }} aria-pressed=${saved} aria-label=${saved ? 'Quitar materia de guardadas' : 'Guardar materia'}
+          onClick=${function () { c.toggleIn('materias', m.key, [m.nombre + ' se guardó en tu perfil', 'Quitaste ' + m.nombre + ' de guardadas']); }}>${I('bookmark', 24, { sw: 2, fill: saved ? '#1f2449' : 'none' })}</button>
+      </div>
+      <span className="tag" style=${{ position: 'relative', marginTop: 10, fontSize: 11 }}>${m.anio.toUpperCase()}</span>
+      <h1 style=${{ position: 'relative', margin: '8px 0 0', fontSize: 28, fontWeight: 900, lineHeight: .95, maxWidth: 260, textTransform: 'uppercase' }}>${m.nombre}</h1>
+      <p style=${{ position: 'relative', margin: '8px 0 0', fontSize: 14, fontWeight: 600 }}>${v.catedra ? v.catedra + ' · ' : ''}${m.regimen}</p>
+    </div>
+    ${m.horarios ? HorariosBlock(c, v, m) : null}
+    <div className="tabs2" role="tablist" aria-label="Contenido de la materia">
+      ${[['cursada', 'Qué se hace'], ['trabajos', 'Trabajos' + (trabajos.length ? ' (' + trabajos.length + ')' : '')]].map(function (t) { var on = matTab === t[0];
+        return html`<button key=${t[0]} type="button" role="tab" aria-selected=${on} className=${on ? 'on' : ''} onClick=${function () { c.up({ matTab: t[0] }); }}>${t[1]}</button>`; })}
+    </div>
+    ${matTab === 'cursada' ? html`<div className="pad stack fade-in" style=${{ gap: 14 }}>
+      <p style=${{ margin: 0, fontSize: 13, lineHeight: 1.5 }}>${m.desc}</p>
+      <ol style=${{ margin: 0, padding: 0, listStyle: 'none', borderLeft: '1px dashed #1f2449', marginLeft: 6 }}>
+        ${m.tps.map(function (tp, i) { return html`<li key=${i} style=${{ position: 'relative', padding: '0 0 16px 20px' }}>
+          <span aria-hidden="true" style=${{ position: 'absolute', left: -6, top: 2, width: 11, height: 11, background: colores[i % 3] }}></span>
+          <span style=${{ fontSize: 10, fontWeight: 700, letterSpacing: '.08em' }}>TP 0${i + 1}</span>
+          <div style=${{ fontSize: 14, fontWeight: 800, marginTop: 2 }}>${tp[0]}</div>
+          <div style=${{ fontSize: 12, marginTop: 3, lineHeight: 1.45 }}>${tp[1]}</div>
+        </li>`; })}
+      </ol>
+      <div style=${{ position: 'relative', background: '#fbce00', padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <span style=${{ fontSize: 16, fontWeight: 900, letterSpacing: '.02em' }}>ROMPAMOS EL MITO</span>
+        <span style=${{ fontSize: 12, lineHeight: 1.45 }}>¿Hay que saber dibujar? No. Lo que se trabaja es pensar, probar y proyectar.</span>
+      </div>
+      <span className="label" style=${{ marginTop: 6 }}>Herramientas que vas a usar</span>
+      <ul style=${{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexWrap: 'wrap', gap: 6 }}>${m.herramientas.map(function (x, i) { return html`<li key=${i} className="mat">${x}</li>`; })}</ul>
+    </div>` : html`<div className="pad stack fade-in" style=${{ gap: 14 }}>
+      <div className="row" style=${{ justifyContent: 'space-between' }}>
+        <span className="label">${v.catedra ? 'De la ' + v.catedra : 'De todas las cátedras'}</span>
+        <button type="button" className="btn-link" onClick=${function () { c.goTab('inicio'); }}>Ver todos en Inicio</button>
+      </div>
+      <button type="button" className="btn btn-ghost btn-block" onClick=${function () { c.openSubir(); c.up(function (p) { return { subir: Object.assign({}, p.subir, { fac: v.fac, car: (facById(v.fac).carreras.filter(function (x) { return materiasDe(v.fac, x.sigla).indexOf(v.nombre) >= 0; })[0] || {}).sigla || '', mat: v.nombre, cat: v.catedra || '' }) }; }); }}>${I('plus', 16, { sw: 2.6 })} Subir un trabajo de esta materia</button>
+      <span style=${{ fontSize: 11, marginTop: -8 }}>Tocá un trabajo para verlo más grande.</span>
+      <div className="grid2" style=${{ gap: 10 }}>
+        ${tiles.map(function (t, i) { return html`<button key=${i} type="button" aria-label=${'Ampliar ' + t.titulo}
+          onClick=${function () { c.up({ zoom: { tiles: tiles, i: i } }); }}
+          style=${{ position: 'relative', aspectRatio: '3 / 4', maxWidth: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', border: 'none', padding: 0, background: t.col.bg, color: t.col.fg }}>
+          ${t.img ? html`<img src=${t.img} alt="" style=${{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />` : html`<span className="grid-navy" aria-hidden="true" style=${{ position: 'absolute', inset: 0, opacity: .8 }}></span>
+          <span aria-hidden="true" style=${{ position: 'relative', fontSize: 44, fontWeight: 900 }}>${t.mark}</span>`}
+          <span style=${{ position: 'absolute', left: 6, bottom: 6, fontSize: 9, fontWeight: 700, textAlign: 'left', background: t.img ? '#1f2449' : 'transparent', color: t.img ? '#fff' : 'inherit', padding: t.img ? '2px 5px' : 0 }}>${t.tp}</span>
+          <span style=${{ position: 'absolute', top: 8, right: 8 }}>${I('expand', 14, { sw: 2.4 })}</span>
+        </button>`; })}
+      </div>
+    </div>`}
+  </div></div>`;
+}
+function otrasMaterias(fac, n, excluir) {
+  var out = [];
+  Object.keys(HORARIOS).forEach(function (key) {
+    var pr = key.split('|'); if (pr[0] !== fac || pr[1] === excluir) return;
+    if (HORARIOS[key].cats.some(function (k) { return k.n === n || k.n.indexOf(n + ' ') === 0 || n.indexOf(k.n + ' ') === 0; })) out.push(pr[1]);
+  });
+  return out;
+}
+function HorariosBlock(c, v, m) {
+  var T = c.S.matTurno || 'todos';
+  var lista = m.horarios.cats.filter(function (x) { return T === 'todos' || x.s.some(function (s) { return s[1] === T; }); });
+  var hay = { M: 0, T: 0, N: 0 };
+  m.horarios.cats.forEach(function (x) { turnosDe(x).forEach(function (t) { if (hay[t] !== undefined) hay[t]++; }); });
+  var sel = v.catedra ? m.horarios.cats.filter(function (k) { return 'Cátedra ' + k.n === v.catedra; })[0] : null;
+  if (sel) lista = [sel].concat(lista.filter(function (k) { return k !== sel; }));
+  function elegir(label) {
+    c.up(function (p) { var st = p.stack.slice(); var top = st[st.length - 1]; st[st.length - 1] = Object.assign({}, top, { catedra: top.catedra === label ? null : label }); return { stack: st }; });
+  }
+  var otras = sel ? otrasMaterias(v.fac, sel.n, v.nombre) : [];
+  return html`<section className="hor" aria-labelledby="t-hor">
+    <div className="row" style=${{ justifyContent: 'space-between', gap: 8 }}>
+      <span className="label" id="t-hor">${I('clock', 13, { sw: 2.6, color: '#d66fa9' })} ${m.horarios.cats.length} cátedras</span>
+      <div className="mini-seg" role="radiogroup" aria-label="Turno">
+        ${[['todos', 'Todas'], ['M', 'M'], ['T', 'T'], ['N', 'N']].map(function (t) {
+          var on = T === t[0], vacio = t[0] !== 'todos' && !hay[t[0]];
+          return html`<button key=${t[0]} type="button" role="radio" aria-checked=${on} className=${on ? 'on' : ''} disabled=${vacio}
+            aria-label=${t[0] === 'todos' ? 'Todos los turnos' : TURNOS[t[0]][0] + ', ' + hay[t[0]] + ' cátedras'} onClick=${function () { c.up({ matTurno: t[0] }); }}>
+            ${t[0] !== 'todos' ? html`<span className=${'tdot t' + t[0]}></span>` : null}${t[0] === 'todos' ? 'Todas' : TURNOS[t[0]][0]}</button>`; })}
+      </div>
+    </div>
+    <div className="cat-strip" role="radiogroup" aria-label="Elegí una cátedra">
+      ${lista.map(function (x) { var label = 'Cátedra ' + x.n, on = v.catedra === label;
+        return html`<button key=${x.n + (x.g || '')} type="button" role="radio" aria-checked=${on} className=${'cat-chip' + (on ? ' on' : '')} onClick=${function () { elegir(label); }}>
+          <span className="dots" aria-hidden="true">${turnosDe(x).map(function (t) { return html`<span key=${t} className=${'tdot t' + t}></span>`; })}</span>${x.g ? html`<span className="cat-g">${x.g}</span>` : null}${x.n}</button>`; })}
+    </div>
+    ${sel ? html`<div className="sel-info fade-in">
+        <div className="row" style=${{ justifyContent: 'space-between', gap: 8, alignItems: 'flex-start' }}>
+          <span className="stack" style=${{ gap: 6, minWidth: 0 }}>
+            <span style=${{ fontSize: 15, fontWeight: 900 }}>${sel.n}</span>
+            <span className="row" style=${{ flexWrap: 'wrap', gap: 5 }}>${sel.s.map(function (s, i) { var tt = TURNOS[s[1]]; return html`<span key=${i} className=${'slot t' + s[1]}>${s[0]} · ${m.horarios.sinHora ? tt[0] : tt[1]}${s[2] ? ' · ' + s[2] : ''}</span>`; })}</span>
+          </span>
+          <button type="button" className="icon-btn plain" style=${{ width: 36, height: 36 }} aria-label="Quitar cátedra elegida" onClick=${function () { elegir(v.catedra); }}>${I('x', 13, { sw: 3 })}</button>
+        </div>
+        ${otras.length ? html`<span style=${{ fontSize: 11, lineHeight: 1.4 }}><strong>También da:</strong> ${otras.join(' · ')}</span>` : null}
+      </div>`
+    : html`<span className="hint">Deslizá y elegí una cátedra para ver su horario y sus trabajos.</span>`}
+  </section>`;
+}
+/* ---------------- FILTROS (botón + hoja) ---------------- */
+function FiltroBar(c, key, groups, vals, onSet, extraClass) {
+  var V = vals || c.S[key]; var setF = onSet || function (o) { c.sub(key, o); };
+  var activos = [];
+  groups.forEach(function (g) { if (V[g.key] !== g.def) { var o = g.opts.filter(function (x) { return x[0] === V[g.key]; })[0]; activos.push({ g: g, label: o ? o[1] : V[g.key] }); } });
+  return html`<div className=${'fbar' + (extraClass ? ' ' + extraClass : '')}>
+    <button type="button" className=${'fbtn' + (activos.length ? ' on' : '')} aria-haspopup="dialog" onClick=${function () { c.up({ filtroAbierto: key }); }}>
+      ${I('sliders', 16, { sw: 2.2 })} Filtros${activos.length ? html`<span className="fcount">${activos.length}</span>` : null}
+    </button>
+    <div className="fpills">
+      ${activos.length ? activos.map(function (a) { return html`<button key=${a.g.key} type="button" className="fpill" aria-label=${'Quitar filtro ' + a.label}
+        onClick=${function () { var o = {}; o[a.g.key] = a.g.def; setF(o); }}>${a.label} ${I('x', 10, { sw: 3 })}</button>`; })
+        : html`<span className="fhint">${groups.map(function (g) { if (g.key === 'car' && g.def !== 'todas') { var cc = g.opts.filter(function (x) { return x[0] === V.car; })[0]; return cc ? cc[1] : ''; } if (g.key === 'turno') return 'Todos los turnos'; var d = g.opts.filter(function (x) { return x[0] === g.def; })[0][1]; return d === 'Todas' ? 'Todas las ' + (g.label === 'Facultad' ? 'facultades' : 'carreras') : d; }).join(' · ')}</span>`}
+    </div>
+  </div>`;
+}
+function FiltroSheet(c, key, groups, total, unidad, vals, onSet) {
+  if (c.S.filtroAbierto !== key) return null;
+  var V = vals || c.S[key]; var setF = onSet || function (o) { c.sub(key, o); };
+  function close() { c.up({ filtroAbierto: null }); }
+  var hay = groups.some(function (g) { return V[g.key] !== g.def; });
+  return html`<div className="veil" onClick=${function (e) { if (e.target === e.currentTarget) close(); }}>
+    <div className="sheet" role="dialog" aria-modal="true" aria-labelledby="f-t">
+      <div className="row" style=${{ justifyContent: 'space-between' }}>
+        <span id="f-t" style=${{ fontSize: 18, fontWeight: 900 }}>FILTROS</span>
+        <button type="button" className="icon-btn" aria-label="Cerrar filtros" onClick=${close}>${I('x', 16, { sw: 2.6 })}</button>
+      </div>
+      ${groups.map(function (g) { return html`<div key=${g.key} className="stack" style=${{ gap: 10 }} role="radiogroup" aria-label=${g.label}>
+        <span className="label">${g.label}</span>
+        <div className="chips wrap">${g.opts.map(function (o) { var on = V[g.key] === o[0];
+          return html`<button key=${o[0]} type="button" role="radio" aria-checked=${on} className=${'chip big' + (on ? ' on' : '')} onClick=${function () { var x = {}; x[g.key] = o[0]; setF(x); }}>${on ? I('check', 13, { sw: 3.2 }) : null}${o[1]}</button>`; })}</div>
+      </div>`; })}
+      <div className="row" style=${{ gap: 10, marginTop: 4 }}>
+        <button type="button" className="btn btn-ghost" disabled=${!hay} onClick=${function () { var x = {}; groups.forEach(function (g) { x[g.key] = g.def; }); setF(x); }}>Limpiar</button>
+        <button type="button" className="btn btn-navy" style=${{ flex: 1 }} onClick=${close}>Ver ${total} ${total === 1 ? unidad[0] : unidad[1]}</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ---------------- CÁTEDRAS por carrera y año ---------------- */
+function limpiaMat(m) { return m.replace(/^[*+]/, '').replace('¹', ''); }
+function turnosDe(cat) { var t = []; cat.s.forEach(function (s) { if (t.indexOf(s[1]) < 0) t.push(s[1]); }); return t; }
+function CatedrasTab(c, f) {
+  var CS = c.S.catTab || {}, u = c.user;
+  var conHor = f.carreras.filter(function (x) { return (x.plan || []).some(function (y) { return y[2].some(function (m) { return horariosDe(f.id, limpiaMat(m), x.sigla); }); }); })[0];
+  var def = (u.nivel === 'facultad' && u.facu === f.id && carreraDe(f.id, u.carrera) ? u.carrera : null) || (conHor || f.carreras[0]).sigla;
+  var car = CS.fac === f.id && CS.car ? CS.car : def;
+  var turno = CS.fac === f.id && CS.turno ? CS.turno : 'todos';
+  var x = carreraDe(f.id, car);
+  function setCS(patch) { c.up({ catTab: Object.assign({ fac: f.id, car: car, turno: turno, open: patch.car && patch.car !== car ? null : openYear }, patch) }); }
+
+  var years = x.plan ? x.plan.map(function (y) {
+      if (/CBC/.test(y[0] + y[1])) { var cm = []; y[2].forEach(function (m) { if (m.charAt(0) === '@') cm = cm.concat(CBC[m.slice(1)]); }); return { anio: y[0] === 'CBC' ? 'CBC' : y[0], ciclo: 'Ciclo Básico Común', cbc: true, mats: cm }; }
+      var mats = []; y[2].forEach(function (m) { if (m.charAt(0) === '+' || m.charAt(0) === '@') return; var n = limpiaMat(m); if (mats.indexOf(n) < 0) mats.push(n); });
+      return { anio: y[0], ciclo: /hs/.test(y[1]) ? '' : y[1].replace(' · ¹ o en 4°', ''), mats: mats };
+    }) : [{ anio: 'Taller', ciclo: 'Materia proyectual', mats: [x.taller] }];
+  var total = 0, conDatos = 0;
+  years = years.map(function (y) {
+    if (y.cbc) return turno === 'todos' ? y : Object.assign({}, y, { mats: [] });
+    var mats = y.mats.map(function (n) {
+      var h = horariosDe(f.id, n, car);
+      if (SIN_CATEDRA_FIJA[n]) return { n: n, fija: false, libre: true };
+      if (!h) return turno === 'todos' ? { n: n, sinDatos: true } : null;
+      var cats = h.cats.filter(function (k) { return turno === 'todos' || turnosDe(k).indexOf(turno) >= 0; });
+      if (!cats.length) return null;
+      total += cats.length; conDatos++;
+      var dias = []; h.cats.forEach(function (k) { k.s.forEach(function (s) { s[0].split(' y ').forEach(function (d) { if (dias.indexOf(d) < 0) dias.push(d); }); }); });
+      return { n: n, h: h, cats: cats, dias: dias };
+    }).filter(Boolean);
+    return Object.assign({}, y, { mats: mats });
+  }).filter(function (y) { return y.mats.length; });
+  var tNombre = { M: 'a la mañana', T: 'a la tarde', N: 'a la noche' }[turno];
+  var openYear = CS.fac === f.id && CS.car === car ? CS.open : null;
+  var fGroups = [{ key: 'car', label: 'Carrera', def: def, opts: f.carreras.map(function (k) { return [k.sigla, k.nombre]; }) },
+    { key: 'turno', label: 'Turno', def: 'todos', opts: [['todos', 'Todos'], ['M', 'Mañana · 8:30 a 12:30'], ['T', 'Tarde · 14 a 18'], ['N', 'Noche · 19 a 23']] }];
+  var fVals = { car: car, turno: turno };
+  function fSet(o) { setCS(o); }
+
+  return html`<div className="stack" style=${{ gap: 0 }}>
+    ${FiltroBar(c, 'cat', fGroups, fVals, fSet, 'flat')}
+    <div className="pad stack" style=${{ gap: 6, paddingTop: 14, paddingBottom: 6 }}>
+      <span className="label" aria-live="polite">${x.nombre} · ${conDatos ? total + (total === 1 ? ' cátedra' : ' cátedras') + (tNombre ? ' ' + tNombre : '') + ' en ' + conDatos + (conDatos === 1 ? ' materia' : ' materias') : (turno !== 'todos' ? 'No hay cátedras ' + tNombre : 'Cátedras a confirmar')}</span>
+      <span className="muted">Tocá un año para ver sus materias y cátedras.</span>
+    </div>
+
+    ${years.length === 0 ? html`<div className="pad"><div className="empty">${I('clock', 30, { color: '#d66fa9' })}<span><strong>No hay cátedras ${tNombre} en ${x.nombre}</strong><br />Probá con otro turno.</span>
+      <button type="button" className="btn btn-navy" onClick=${function () { setCS({ turno: 'todos' }); }}>Ver todos los turnos</button></div></div>` : null}
+
+    ${years.map(function (y) {
+      var abierto = openYear === y.anio;
+      var nCats = y.cbc ? 0 : y.mats.reduce(function (acc, m) { return acc + (m.cats ? m.cats.length : 0); }, 0);
+      var num = (y.anio.match(/\d+/) || [y.anio === 'CBC' ? '1' : '·'])[0];
+      var resumen = y.cbc ? y.mats.length + ' materias · cátedras del CBC' : y.mats.length + (y.mats.length === 1 ? ' materia' : ' materias') + (nCats ? ' · ' + nCats + ' cátedras' : ' · a confirmar');
+      return html`<section key=${y.anio} className=${'year' + (abierto ? ' open' : '')}>
+      <button type="button" className="year-head" aria-expanded=${abierto} onClick=${function () { setCS({ open: abierto ? null : y.anio }); }}>
+        <span className="year-num" aria-hidden="true">${num}</span>
+        <span className="stack" style=${{ gap: 2, flex: 1, minWidth: 0, textAlign: 'left' }}>
+          <span style=${{ fontSize: 15, fontWeight: 900, letterSpacing: '.04em', textTransform: 'uppercase' }}>${y.anio === 'CBC' ? '1° año · CBC' : y.anio}</span>
+          <span style=${{ fontSize: 11, fontWeight: 600 }}>${y.ciclo ? y.ciclo + ' · ' : ''}${resumen}</span>
+        </span>
+        <span className="chev" aria-hidden="true">${I('chev', 20, { sw: 2.4 })}</span>
+      </button>
+      ${abierto ? html`<div className="stack fade-in" style=${{ gap: 10, paddingTop: 4 }}>
+        ${y.cbc ? html`<div className="alert info" style=${{ fontSize: 12 }}>${I('info', 18)}<span>El CBC se cursa en las sedes de la UBA (o a distancia con UBA XXI) y tiene cátedras propias. Horarios en <strong>cbc.uba.ar</strong>.</span></div>
+          <div className="mat-card"><div className="stack" style=${{ padding: 12, gap: 8 }}>${y.mats.map(function (n) { return html`<span key=${n} className="row" style=${{ gap: 8, fontSize: 13, fontWeight: 700 }}><span className="tdot tX" aria-hidden="true"></span>${n}</span>`; })}</div></div>`
+        : html`
+        ${y.mats.map(function (m) {
+            if (m.libre) return html`<div key=${m.n} className="mat-card libre"><div className="mat-head" style=${{ cursor: 'default' }}><span className="stack" style=${{ gap: 2 }}><span className="mat-name">${m.n}</span><span className="mat-meta">Sin cátedra fija · elegís entre la oferta del año</span></span>
+              <a className="btn-link" href="https://www.fadu.uba.ar/diseno-grafico/" target="_blank" rel="noopener">Ver oferta ↗</a></div></div>`;
+            if (m.sinDatos) return html`<div key=${m.n} className="mat-card">
+              <button type="button" className="mat-head" onClick=${function () { c.push({ type: 'materia', fac: f.id, nombre: m.n, car: car }); }}>
+                <span className="stack" style=${{ gap: 2 }}><span className="mat-name">${m.n}</span><span className="mat-meta">Cátedras y horarios a confirmar</span></span>${I('arrow', 14, { sw: 2.4, color: '#d66fa9' })}</button>
+              ${x.plan ? null : html`<div className="cat-chips">${CATEDRAS.map(function (k) { return html`<button key=${k} type="button" className="cat-chip pend" onClick=${function () { c.up({ catSheet: { fac: f.id, car: car, materia: m.n, n: k.replace('Cátedra ', ''), pend: true } }); }}>${k}</button>`; })}</div>`}
+            </div>`;
+            return html`<div key=${m.n} className="mat-card">
+              <button type="button" className="mat-head" onClick=${function () { c.push({ type: 'materia', fac: f.id, nombre: m.n, car: car }); }}>
+                <span className="stack" style=${{ gap: 2 }}><span className="mat-name">${m.n}</span><span className="mat-meta">${m.h.regimen} · ${m.h.cats.length} ${m.h.cats.length === 1 ? 'cátedra' : 'cátedras'}</span></span>
+                <span className="mat-go">Ficha ${I('arrow', 13, { sw: 2.4 })}</span></button>
+              <div className="cat-chips">${m.cats.map(function (k) { return html`<button key=${k.n + (k.g || '')} type="button" className="cat-chip" aria-label=${'Cátedra ' + k.n + (k.g ? ', ' + k.g : '') + ', ver información'}
+                  onClick=${function () { c.up({ catSheet: { fac: f.id, car: car, materia: m.n, n: k.n, g: k.g } }); }}>
+                  <span className="dots" aria-hidden="true">${turnosDe(k).map(function (t) { return html`<span key=${t} className=${'tdot t' + t}></span>`; })}</span>
+                  ${k.g ? html`<span className="cat-g">${k.g}</span>` : null}${k.n}</button>`; })}</div>
+            </div>`;
+          })}`}
+      </div>` : null}
+    </section>`; })}
+    <div className="pad stack" style=${{ gap: 8 }}>
+      <div className="row" style=${{ gap: 14, flexWrap: 'wrap', fontSize: 11, fontWeight: 700 }}>${['M', 'T', 'N'].map(function (t) { return html`<span key=${t} className="row" style=${{ gap: 5 }}><span className=${'tdot t' + t}></span>${TURNOS[t][0]} · ${TURNOS[t][1]}</span>`; })}</div>
+      <span className="hint">Fuente: fadu.uba.ar. Antes de inscribirte confirmá aula y cambios en el SIU Guaraní.</span>
+    </div>
+    ${FiltroSheet(c, 'cat', fGroups, total, ['cátedra', 'cátedras'], fVals, fSet)}
+  </div>`;
+}
+function CatedraSheet(c) {
+  var K = c.S.catSheet, f = facById(K.fac), x = carreraDe(K.fac, K.car);
+  function close() { c.up({ catSheet: null }); }
+  var h = horariosDe(K.fac, K.materia, K.car);
+  var cat = h ? h.cats.filter(function (k) { return k.n === K.n && (k.g || null) === (K.g || null); })[0] : null;
+  var label = 'Cátedra ' + K.n;
+  var otras = [];
+  Object.keys(HORARIOS).forEach(function (key) {
+    var pr = key.split('|'); if (pr[0] !== K.fac || pr[1] === K.materia) return;
+    if (HORARIOS[key].cats.some(function (k) { return k.n === K.n || k.n.indexOf(K.n + ' ') === 0 || K.n.indexOf(k.n + ' ') === 0; })) otras.push(pr[1]);
+  });
+  var trabajos = c.allPosts.filter(function (p) { return p.fac === K.fac && p.materia === K.materia && p.catedra === label; });
+  var anio = anioEnPlan(K.fac, K.materia, K.car);
+  function verMateria() { close(); c.push({ type: 'materia', fac: K.fac, nombre: K.materia, car: K.car, catedra: label }); }
+  function subir() { close(); c.openSubir(); c.up(function (p) { return { subir: Object.assign({}, p.subir, { fac: K.fac, car: K.car, mat: K.materia, cat: label }) }; }); }
+  return html`<div className="veil" onClick=${function (e) { if (e.target === e.currentTarget) close(); }}>
+    <div className="sheet cat-sheet" role="dialog" aria-modal="true" aria-labelledby="cs-t">
+      <div className="cat-sheet-top">
+        <div className="grid-rosa" aria-hidden="true" style=${{ position: 'absolute', right: 0, top: 0, width: 140, height: '100%' }}></div>
+        <div className="row" style=${{ justifyContent: 'space-between', position: 'relative' }}>
+          <span className="label" style=${{ color: '#d66fa9' }}>${K.g ? K.g : 'Cátedra'}</span>
+          <button type="button" className="icon-btn" style=${{ color: '#d66fa9' }} aria-label="Cerrar" onClick=${close}>${I('x', 16, { sw: 2.6 })}</button>
+        </div>
+        <h2 id="cs-t" style=${{ position: 'relative', margin: '4px 0 0', fontSize: 34, fontWeight: 900, lineHeight: .95, color: '#d66fa9', textTransform: 'uppercase' }}>${K.pend ? label : K.n}</h2>
+        <span style=${{ position: 'relative', fontSize: 13, color: '#fff', marginTop: 8, display: 'block' }}>${K.materia} · ${x ? x.nombre : ''} · ${f.sigla}${anio ? ' · ' + anio.split(' · ')[0] : ''}</span>
+      </div>
+      <div className="stack" style=${{ gap: 10 }}>
+        <span className="label">Días y horarios</span>
+        ${cat ? cat.s.map(function (s, i) { var t = TURNOS[s[1]]; return html`<div key=${i} className=${'slot-row t' + s[1]}>
+            <span className="slot-dia">${s[0]}</span>
+            <span className="stack" style=${{ gap: 1, flex: 1 }}><span style=${{ fontSize: 14, fontWeight: 800 }}>${h.sinHora ? 'Turno ' + t[0].toLowerCase() : t[1]}</span><span style=${{ fontSize: 11, fontWeight: 600 }}>${h.sinHora ? 'Horario según la cátedra' : 'Turno ' + t[0].toLowerCase()}${s[2] ? ' · ' + s[2] : ''}</span></span>
+          </div>`; })
+          : html`<div className="alert info">${I('info', 18)}<span>Todavía no tenemos los horarios de esta cátedra. Los vamos a cargar cuando estén publicados.</span></div>`}
+        ${h ? html`<span className="hint">Régimen: ${h.regimen}.</span>` : null}
+      </div>
+      ${otras.length ? html`<div className="stack" style=${{ gap: 8 }}>
+        <span className="label">También da clases en</span>
+        <div className="row" style=${{ flexWrap: 'wrap', gap: 6 }}>${otras.map(function (o) { return html`<button key=${o} type="button" className="chip" onClick=${function () { c.up({ catSheet: Object.assign({}, K, { materia: o, g: null, pend: false, n: (horariosDe(K.fac, o).cats.filter(function (k) { return k.n === K.n || k.n.indexOf(K.n + ' ') === 0 || K.n.indexOf(k.n + ' ') === 0; })[0] || {}).n || K.n }) }); }}>${o}</button>`; })}</div>
+        ${otras.some(function (o) { return /Diseño Gráfico I/.test(o); }) ? html`<span className="hint">Los talleres suelen tener continuidad: si empezás con una cátedra, podés seguir con ella en los años siguientes.</span>` : null}
+      </div>` : null}
+      <div className="stack" style=${{ gap: 8 }}>
+        <span className="label">Trabajos de esta cátedra</span>
+        <span className="muted">${trabajos.length ? trabajos.length + (trabajos.length === 1 ? ' trabajo publicado' : ' trabajos publicados') : 'Todavía nadie subió trabajos de esta cátedra.'}</span>
+      </div>
+      <div className="grid2" style=${{ gap: 10 }}>
+        <button type="button" className="btn btn-ghost" onClick=${subir}>${I('plus', 15, { sw: 2.6 })} Subir</button>
+        <button type="button" className="btn btn-navy" onClick=${verMateria}>Ver materia ${I('arrow', 14, { sw: 2.4 })}</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function ZoomView(c) {
+  var z = c.S.zoom, t = z.tiles[z.i], n = z.tiles.length;
+  function go(d) { c.up({ zoom: { tiles: z.tiles, i: (z.i + d + n) % n } }); }
+  return html`<div className="veil" role="dialog" aria-modal="true" aria-label=${t.titulo} style=${{ alignItems: 'stretch', background: 'rgba(31,36,73,.95)' }}>
+    <div className="stack" style=${{ flex: 1, padding: '16px 20px 24px', gap: 14 }}>
+      <div className="row" style=${{ justifyContent: 'space-between', color: '#fff' }}>
+        <span className="label">${z.i + 1} de ${n}</span>
+        <button type="button" className="icon-btn" style=${{ color: '#d66fa9' }} aria-label="Cerrar vista ampliada" onClick=${function () { c.up({ zoom: null }); }}>${I('x', 16, { sw: 2.6 })}</button>
+      </div>
+      <div className="fade-in" style=${{ position: 'relative', flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', background: t.img ? '#11142b' : t.col.bg, color: t.img ? '#fff' : t.col.fg }}>
+        <span className="grid-navy" aria-hidden="true" style=${{ position: 'absolute', inset: 0, opacity: .8 }}></span>
+        ${t.img ? html`<img src=${t.img} alt=${t.titulo} style=${{ position: 'relative', width: '100%', height: '100%', objectFit: 'contain' }} />` : html`
+        <span aria-hidden="true" style=${{ position: 'relative', fontSize: 110, fontWeight: 900 }}>${t.mark}</span>
+        <span style=${{ position: 'absolute', left: 12, bottom: 10, fontSize: 11, fontWeight: 700 }}>[FOTO DEL TRABAJO]</span>`}
+      </div>
+      <div className="stack" style=${{ color: '#fff', gap: 4 }}><span className="label" style=${{ color: '#d66fa9' }}>${t.tp}</span><span style=${{ fontSize: 18, fontWeight: 800 }}>${t.titulo}</span></div>
+      <div className="grid2" style=${{ gap: 10 }}>
+        <button type="button" className="btn btn-ghost on-dark" onClick=${function () { go(-1); }}>← Anterior</button>
+        <button type="button" className="btn btn-rosa" onClick=${function () { go(1); }}>Siguiente →</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ---------------- PERFIL ---------------- */
+var PF = ['nombre', 'apellido', 'edad', 'email', 'nivel', 'anio', 'facu', 'carrera', 'anioCar'];
+function perfilDirty(c) {
+  var P = c.S.perfil, u = c.user; if (!P.form || !u) return false;
+  return PF.some(function (k) { return (P.form[k] || '') !== (u[k] || ''); });
+}
+function perfilErrors(f, users, email) {
+  var e = {};
+  if (!f.nombre.trim()) e.nombre = 'Escribí tu nombre';
+  var n = parseInt(f.edad, 10); if (f.edad !== '' && (isNaN(n) || n < 12 || n > 99)) e.edad = 'Entre 12 y 99';
+  if (f.nivel === 'facultad' && !f.facu) e.facu = 'Elegí tu facultad';
+  if (f.nivel === 'facultad' && !f.carrera) e.carrera = 'Elegí tu carrera';
+  var ee = emailError(f.email); if (ee) e.email = ee;
+  else if (f.email.trim().toLowerCase() !== email && users[f.email.trim().toLowerCase()]) e.email = 'Ese email ya lo usa otra cuenta';
+  return e;
+}
+function PerfilScreen(c) {
+  var u = c.user, P = c.S.perfil;
+  var form = P.form || { nombre: u.nombre, apellido: u.apellido || '', edad: u.edad || '', email: u.email, nivel: u.nivel || 'secundaria', anio: u.anio || '5° año', facu: u.facu || '', carrera: u.carrera || '', anioCar: u.anioCar || '1° año' };
+  var errs = perfilErrors(form, c.S.users, c.S.email);
+  function show(k) { return (P.touched[k] || P.tried) && errs[k] ? errs[k] : ''; }
+  function set(k, v) { var nf = Object.assign({}, form); nf[k] = v; var t = Object.assign({}, P.touched); t[k] = true; c.sub('perfil', { form: nf, touched: t }); }
+  var dirty = perfilDirty(c);
+  var prov = provById(u.prov);
+  var checks = [!!u.nombre, !!u.apellido, !!u.edad, u.nivel === 'facultad' ? !!u.carrera : !!u.anio, !!u.email, !!u.prov, u.intereses.length > 0, !!u.avatar];
+  var done = checks.filter(Boolean).length, pct = Math.round(done / checks.length * 100);
+  var falta = !u.avatar ? 'una foto de perfil' : !u.apellido ? 'tu apellido' : !u.edad ? 'tu edad' : 'elegir tus intereses';
+
+  function onFoto(e) {
+    var file = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    if (!/^image\//.test(file.type)) { c.notify('Ese archivo no es una imagen. Probá con una foto JPG o PNG.', null, true); return; }
+    if (file.size > 15 * 1024 * 1024) { c.notify('La foto pesa más de 15 MB. Elegí una más liviana.', null, true); return; }
+    var r = new FileReader();
+    r.onerror = function () { c.notify('No pudimos leer la foto. Probá con otra.', null, true); };
+    r.onload = function () {
+      var img = new Image();
+      img.onerror = function () { c.notify('No pudimos abrir la foto. Probá con otra en JPG o PNG.', null, true); };
+      img.onload = function () {
+        var s = 320, cv = document.createElement('canvas'); cv.width = s; cv.height = s;
+        var m = Math.min(img.width, img.height);
+        cv.getContext('2d').drawImage(img, (img.width - m) / 2, (img.height - m) / 2, m, m, 0, 0, s, s);
+        var data = cv.toDataURL('image/jpeg', 0.85), antes = u.avatar || null;
+        c.updUser(function (x) { x.avatar = data; });
+        c.notify('Foto de perfil actualizada', function () { c.updUser(function (x) { x.avatar = antes; }); });
+      };
+      img.src = r.result;
+    };
+    r.readAsDataURL(file);
+  }
+  function quitarFoto() {
+    var antes = u.avatar;
+    c.updUser(function (x) { x.avatar = null; });
+    c.notify('Quitaste tu foto de perfil', function () { c.updUser(function (x) { x.avatar = antes; }); });
+  }
+
+  function guardar() {
+    if (Object.keys(errs).length) { c.sub('perfil', { tried: true }); return; }
+    var antes = {}; PF.forEach(function (k) { antes[k] = u[k]; });
+    var nuevoEmail = form.email.trim().toLowerCase();
+    c.up(function (p) {
+      var users = Object.assign({}, p.users), x = Object.assign({}, users[p.email]);
+      PF.forEach(function (k) { x[k] = (form[k] || '').trim ? form[k].trim() : form[k]; }); x.email = nuevoEmail;
+      delete users[p.email]; users[nuevoEmail] = x;
+      return { users: users, email: nuevoEmail, perfilHoja: null, perfil: Object.assign({}, p.perfil, { form: null, touched: {}, tried: false }) };
+    });
+    c.notify('Perfil guardado', function () {
+      c.up(function (p) { var users = Object.assign({}, p.users), x = Object.assign({}, users[p.email], antes); delete users[p.email]; users[antes.email] = x; return { users: users, email: antes.email }; });
+    });
+  }
+  function descartar() { var antes = P.form; c.sub('perfil', { form: null, touched: {}, tried: false }); c.notify('Cambios descartados', function () { c.sub('perfil', { form: antes }); }); }
+  function setProv(id) {
+    var antes = u.prov; c.updUser(function (x) { x.prov = id; });
+    c.notify('Te mostramos facultades de ' + provById(id).nombre, function () { c.updUser(function (x) { x.prov = antes; }); });
+  }
+  function toggleInt(k) { c.updUser(function (x) { var i = x.intereses.indexOf(k); if (i >= 0) x.intereses.splice(i, 1); else x.intereses.push(k); }); }
+
+  var misPosts = c.S.posts.filter(function (p) { return p.autorEmail === c.S.email; });
+  var segs = [['posts', 'Trabajos'], ['facs', 'Facultades'], ['materias', 'Materias'], ['becas', 'Becas']];
+  var items = [];
+  if (P.seg === 'posts') items = u.saved.posts.map(function (id) { var p = c.allPosts.filter(function (x) { return x.id === id; })[0]; return p && { k: id, t: p.titulo, s: p.autor + ' · ' + facById(p.fac).sigla, go: function () { c.push({ type: 'materia', fac: p.fac, nombre: p.materia, catedra: p.catedra }); }, kind: 'post', color: TILE[p.color] || TILE.navy, mark: p.mark || '', img: p.fotos && p.fotos[0] }; });
+  if (P.seg === 'facs') items = u.saved.facs.map(function (id) { var f = facById(id); return { k: id, t: f.sigla + ' · ' + f.uni, s: f.nombre, go: function () { c.push({ type: 'facultad', id: id }); }, img: f.img, color: { bg: f.color } }; });
+  if (P.seg === 'materias') items = u.saved.materias.map(function (k) { var pr = k.split('|'); var f = facById(pr[0]); return { k: k, t: pr[1], s: f.sigla + ' · ' + f.uni, go: function () { c.push({ type: 'materia', fac: pr[0], nombre: pr[1] }); }, color: TILE.green, mark: 'M' }; });
+  if (P.seg === 'becas') items = u.saved.becas.map(function (k) { var pr = k.split('|'); var f = facById(pr[0]); return { k: k, t: pr[1], s: 'Te avisamos cuando abra · ' + f.sigla, go: function () { c.sub('det', { tab: 'becas' }); c.push({ type: 'facultad', id: pr[0] }); setTimeout(function () { c.sub('det', { tab: 'becas' }); }, 0); }, color: TILE.yellow, mark: '$' }; });
+  items = items.filter(Boolean);
+  var emptyTxt = { posts: ['Todavía no guardaste trabajos', 'Tocá el marcador en cualquier trabajo de Inicio.', 'inicio', 'Ir a Inicio'], facs: ['Todavía no guardaste facultades', 'Entrá a una facultad y tocá el marcador de arriba.', 'facultades', 'Ver facultades'], materias: ['Todavía no guardaste materias', 'Abrí una materia desde un trabajo y guardala.', 'inicio', 'Ir a Inicio'], becas: ['No te anotaste a ninguna beca', 'En cada facultad, pestaña Becas, tocá "Me interesa".', 'facultades', 'Ver facultades'] }[P.seg];
+
+  var hoja = c.S.perfilHoja || null;
+  function abrir(h) { if (h === 'datos') c.sub('perfil', { form: null, touched: {}, tried: false }); c.up({ perfilHoja: h }); }
+  function cerrar() { c.up({ perfilHoja: null }); }
+  var sub = u.nivel === 'facultad' ? ((carreraDe(u.facu, u.carrera) || {}).nombre || 'Facultad') : 'Secundaria · ' + (u.anio || '');
+  var subTag = u.nivel === 'facultad' ? (facById(u.facu) || {}).sigla : null;
+  var intTxt = u.intereses.length ? INTERESES.filter(function (it) { return u.intereses.indexOf(it[0]) >= 0; }).map(function (it) { return it[1]; }).join(', ') : 'Ninguno elegido';
+
+  function Row(icon, titulo, detalle, onClick, alerta) {
+    return html`<button type="button" className="set-row" onClick=${onClick}>
+      <span className="set-ic" aria-hidden="true">${I(icon, 18, { sw: 2 })}</span>
+      <span className="stack" style=${{ flex: 1, minWidth: 0, gap: 1 }}><span className="set-t">${titulo}</span>${detalle ? html`<span className=${'set-d' + (alerta ? ' warn' : '')}>${detalle}</span>` : null}</span>
+      ${I('chevr', 16, { sw: 2.4 })}
+    </button>`;
+  }
+
+  return html`<div className="screen">
+    <div className="scroll">
+      <div className="hdr p-hdr">
+        <div className="halftone deco" aria-hidden="true" style=${{ top: -40, right: -40, width: 120, height: 120, borderRadius: '50%', opacity: .5 }}></div>
+        <div className="row" style=${{ gap: 14 }}>
+          <label className="avatar-edit" htmlFor="p-foto" title="Cambiar foto de perfil">
+            ${Avatar(u, 64)}
+            <span className="cam" aria-hidden="true">${I('camera', 13, { sw: 2.2 })}</span>
+            <span className="sr">Cambiar foto de perfil</span>
+            <input id="p-foto" className="sr" type="file" accept="image/*" onChange=${onFoto} />
+          </label>
+          <div className="stack" style=${{ gap: 5, minWidth: 0, flex: 1 }}>
+            <h1 style=${{ margin: 0, fontSize: 22, lineHeight: 1, textTransform: 'uppercase' }}>${u.nombre} ${u.apellido}</h1>
+            <span className="row" style=${{ gap: 6, fontSize: 13, color: '#fff', minWidth: 0 }}>${subTag ? html`<span className="tag">${subTag}</span>` : null}<span style=${{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>${sub}</span></span>
+          </div>
+        </div>
+        ${pct < 100 ? html`<button type="button" className="p-prog" onClick=${function () { if (!u.avatar) { document.getElementById('p-foto').click(); } else if (!u.intereses.length) abrir('intereses'); else abrir('datos'); }}>
+          <span className="row" style=${{ justifyContent: 'space-between', width: '100%' }}><span>Completá tu perfil · te falta ${falta}</span><span>${pct}%</span></span>
+          <span className="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow=${pct} aria-label="Perfil completo" style=${{ display: 'block', width: '100%' }}><span style=${{ display: 'block', height: '100%', background: '#d66fa9', width: pct + '%' }}></span></span>
+        </button>` : null}
+      </div>
+
+      <section className="p-sec" aria-labelledby="t-mios">
+        <div className="row" style=${{ justifyContent: 'space-between' }}>
+          <h2 className="h2" id="t-mios">Mis trabajos${misPosts.length ? html` <span className="tag">${misPosts.length}</span>` : null}</h2>
+          <button type="button" className="btn-link" onClick=${function () { c.openSubir(); }}>+ Subir</button>
+        </div>
+        ${misPosts.length === 0 ? html`<button type="button" className="p-empty" onClick=${function () { c.openSubir(); }}>
+            <span className="set-ic" aria-hidden="true">${I('plus', 18, { sw: 2.6 })}</span>
+            <span style=${{ flex: 1, textAlign: 'left' }}>${u.nivel === 'facultad' ? 'Subí tu primera entrega para que otros vean qué se hace en tu cursada.' : 'Subí algo que hayas diseñado, en la escuela o por tu cuenta.'}</span>
+          </button>`
+        : html`<div className="mini-strip">${misPosts.map(function (p) { return html`<button key=${p.id} type="button" className="mini" onClick=${function () { c.up({ zoom: { tiles: p.fotos.map(function (x, j) { return { img: x, titulo: p.titulo, tp: 'Foto ' + (j + 1) + ' de ' + p.fotos.length }; }), i: 0 } }); }}>
+            <img src=${p.fotos[0]} alt="" />
+            <span className="stack" style=${{ gap: 2, padding: '6px 8px' }}><span style=${{ fontSize: 11, fontWeight: 800, lineHeight: 1.2 }}>${p.titulo}</span></span>
+          </button>`; })}</div>`}
+      </section>
+
+      <section className="p-sec" aria-labelledby="t-guardados">
+        <h2 className="h2" id="t-guardados">Guardados</h2>
+        <div className="seg seg-sm" role="tablist" aria-label="Tipo de guardado">
+          ${segs.map(function (sg) { var n = u.saved[sg[0]].length, on = P.seg === sg[0]; return html`<button key=${sg[0]} type="button" role="tab" aria-selected=${on} className=${on ? 'on' : ''} onClick=${function () { c.sub('perfil', { seg: sg[0] }); }}>${sg[1]}${n ? ' ' + n : ''}</button>`; })}
+        </div>
+        ${items.length === 0 ? html`<p className="p-none">${emptyTxt[1]} <button type="button" className="btn-link" style=${{ padding: 0, minHeight: 0 }} onClick=${function () { c.goTab(emptyTxt[2]); }}>${emptyTxt[3]}</button></p>`
+        : html`<div className="stack" style=${{ gap: 6 }}>${items.map(function (it) { return html`<button key=${it.k} type="button" className="list-item sm" onClick=${it.go}>
+          ${it.img ? html`<span className="duo" style=${{ width: 40, height: 40, flexShrink: 0, background: it.color.bg }}><img src=${it.img} alt="" /></span>`
+            : html`<span aria-hidden="true" style=${{ width: 40, height: 40, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: it.color.bg, color: it.color.fg, fontWeight: 900, fontSize: 14 }}>${it.mark}</span>`}
+          <span className="stack" style=${{ flex: 1, minWidth: 0, gap: 1 }}><span style=${{ fontSize: 13, fontWeight: 800, lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>${it.t}</span><span style=${{ fontSize: 11 }}>${it.s}</span></span>
+          ${I('chevr', 14, { sw: 2.4 })}
+        </button>`; })}</div>`}
+      </section>
+
+      <section className="p-sec" aria-labelledby="t-cerca">
+        <div className="row" style=${{ justifyContent: 'space-between' }}><h2 className="h2" id="t-cerca">Cerca tuyo</h2><button type="button" className="btn-link" onClick=${function () { abrir('provincia'); }}>${prov.nombre} · Cambiar</button></div>
+        <div className="stack" style=${{ gap: 6 }}>${prov.facs.map(function (id) { var f = facById(id); return html`<button key=${id} type="button" className="list-item sm" onClick=${function () { c.push({ type: 'facultad', id: id }); }}>
+          <span className="duo" style=${{ width: 40, height: 40, flexShrink: 0, background: f.color }}><img src=${f.img} alt="" loading="lazy" /></span>
+          <span className="stack" style=${{ flex: 1, minWidth: 0, gap: 1 }}><span style=${{ fontSize: 13, fontWeight: 800 }}>${f.sigla} · ${f.uni}</span><span style=${{ fontSize: 11, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>${f.ciudad} · ${f.carreras.map(function (x) { return x.sigla; }).join(' · ')}</span></span>
+          ${I('chevr', 14, { sw: 2.4 })}
+        </button>`; })}</div>
+      </section>
+
+      <section className="p-sec" style=${{ paddingBottom: 24 }} aria-label="Ajustes">
+        <h2 className="h2">Ajustes</h2>
+        <div className="set-list">
+          ${Row('user', 'Tus datos', u.email + (u.edad ? ' · ' + u.edad + ' años' : ''), function () { abrir('datos'); }, !u.apellido || !u.edad)}
+          ${Row('heart', 'Me interesa', intTxt, function () { abrir('intereses'); }, !u.intereses.length)}
+          ${Row('fac', 'Provincia', prov.nombre, function () { abrir('provincia'); })}
+          ${u.avatar ? Row('camera', 'Foto de perfil', 'Cambiar o quitar', function () { abrir('foto'); }) : null}
+          ${Row('help', 'Cómo funciona la app', null, function () { c.up({ sheet: 'ayuda' }); })}
+          <button type="button" className="set-row" onClick=${function () { c.up({ sheet: 'logout' }); }}>
+            <span className="set-ic" aria-hidden="true">${I('logout', 18, { sw: 2 })}</span><span className="set-t" style=${{ flex: 1, textAlign: 'left' }}>Cerrar sesión</span>
+          </button>
+        </div>
+        <span className="hint">Prototipo de Tinta Brava para Ministerio de Educación × Grupo EDISUR. Tus datos se guardan solo en este navegador.</span>
+      </section>
+    </div>
+
+    ${hoja === 'datos' ? html`<div className="veil" onClick=${function (e) { if (e.target === e.currentTarget) cerrar(); }}>
+      <form noValidate className="sheet" role="dialog" aria-modal="true" aria-labelledby="pd-t" onSubmit=${function (e) { e.preventDefault(); guardar(); }}>
+        <div className="row" style=${{ justifyContent: 'space-between' }}><span id="pd-t" className="sheet-t">Tus datos</span>
+          <button type="button" className="icon-btn" aria-label="Cerrar sin guardar" onClick=${cerrar}>${I('x', 16, { sw: 2.6 })}</button></div>
+        ${P.tried && Object.keys(errs).length ? html`<div className="alert err" role="alert">${I('alert', 18)}<span>Revisá los campos marcados para poder guardar.</span></div>` : null}
+        <div className="grid2">
+          <div className="field"><label htmlFor="p-nombre">Nombre *</label><input id="p-nombre" className=${'input' + (show('nombre') ? ' err' : '')} value=${form.nombre} onChange=${function (e) { set('nombre', e.target.value); }} />${Msg(show('nombre'))}</div>
+          <div className="field"><label htmlFor="p-apellido">Apellido</label><input id="p-apellido" className="input" value=${form.apellido} onChange=${function (e) { set('apellido', e.target.value); }} /></div>
+        </div>
+        <div className="field"><label htmlFor="p-email">Email *</label><input id="p-email" className=${'input' + (show('email') ? ' err' : '')} type="email" inputMode="email" value=${form.email} onChange=${function (e) { set('email', e.target.value); }} />${Msg(show('email'))}</div>
+        <div className="grid2">
+          <div className="field"><label htmlFor="p-edad">Edad</label><input id="p-edad" className=${'input' + (show('edad') ? ' err' : '')} type="number" inputMode="numeric" min="12" max="99" value=${form.edad} onChange=${function (e) { set('edad', e.target.value); }} />${Msg(show('edad'))}</div>
+          <div className="field"><label htmlFor="p-nivel">Etapa</label><select id="p-nivel" className="input" value=${form.nivel} onChange=${function (e) { set('nivel', e.target.value); }}><option value="secundaria">Secundaria</option><option value="facultad">Facultad</option></select></div>
+        </div>
+        ${form.nivel === 'facultad' ? html`<div className="field"><label htmlFor="p-facu">Facultad *</label>
+            <select id="p-facu" className=${'input' + (show('facu') ? ' err' : '')} value=${form.facu} onChange=${function (e) { var nf = Object.assign({}, form, { facu: e.target.value, carrera: '' }); c.sub('perfil', { form: nf }); }}>
+              <option value="" disabled>Elegí tu facultad</option>
+              ${FACS.map(function (f) { return html`<option key=${f.id} value=${f.id}>${f.sigla} · ${f.uni}</option>`; })}
+            </select>${Msg(show('facu'))}</div>
+          <div className="grid2">
+            <div className="field"><label htmlFor="p-car">Carrera *</label>
+              <select id="p-car" className=${'input' + (show('carrera') ? ' err' : '')} disabled=${!form.facu} value=${form.carrera} onChange=${function (e) { set('carrera', e.target.value); }}>
+                <option value="" disabled>${form.facu ? 'Elegí' : 'Primero la facultad'}</option>
+                ${(form.facu ? facById(form.facu).carreras : []).map(function (x) { return html`<option key=${x.sigla} value=${x.sigla}>${x.nombre}</option>`; })}
+              </select>${Msg(show('carrera'))}</div>
+            <div className="field"><label htmlFor="p-aniocar">Año</label><select id="p-aniocar" className="input" value=${form.anioCar} onChange=${function (e) { set('anioCar', e.target.value); }}>${ANIOS_CAR.map(function (a) { return html`<option key=${a} value=${a}>${a}</option>`; })}</select></div>
+          </div>`
+        : html`<div className="field"><label htmlFor="p-anio">Año que cursás</label><select id="p-anio" className="input" value=${form.anio} onChange=${function (e) { set('anio', e.target.value); }}>${ANIOS.map(function (a) { return html`<option key=${a} value=${a}>${a}</option>`; })}</select></div>`}
+        <div className="grid2" style=${{ gap: 10 }}>
+          <button type="button" className="btn btn-ghost" onClick=${cerrar}>Cancelar</button>
+          <button type="submit" className="btn btn-navy" disabled=${!dirty}>Guardar</button>
+        </div>
+      </form>
+    </div>` : null}
+
+    ${hoja === 'intereses' ? html`<div className="veil" onClick=${function (e) { if (e.target === e.currentTarget) cerrar(); }}>
+      <div className="sheet" role="dialog" aria-modal="true" aria-labelledby="pi-t">
+        <div className="row" style=${{ justifyContent: 'space-between' }}><span id="pi-t" className="sheet-t">Me interesa</span><span className="label" aria-live="polite">${u.intereses.length} ${u.intereses.length === 1 ? 'elegida' : 'elegidas'}</span></div>
+        <span className="muted">Inicio te muestra primero los trabajos de estas carreras. Se guarda solo.</span>
+        <div className="chips wrap">${INTERESES.map(function (it) { var on = u.intereses.indexOf(it[0]) >= 0;
+          return html`<button key=${it[0]} type="button" className=${'chip big' + (on ? ' on' : '')} aria-pressed=${on} onClick=${function () { toggleInt(it[0]); }}>${on ? I('check', 13, { sw: 3.2 }) : null}${it[1]}</button>`; })}</div>
+        ${u.intereses.length === 0 ? Msg('Elegí al menos una.') : null}
+        <button type="button" className="btn btn-navy btn-block" onClick=${cerrar}>Listo</button>
+      </div>
+    </div>` : null}
+
+    ${hoja === 'provincia' ? html`<div className="veil" onClick=${function (e) { if (e.target === e.currentTarget) cerrar(); }}>
+      <div className="sheet" role="dialog" aria-modal="true" aria-labelledby="pp-t">
+        <div className="row" style=${{ justifyContent: 'space-between' }}><span id="pp-t" className="sheet-t">Tu provincia</span>
+          <button type="button" className="icon-btn" aria-label="Cerrar" onClick=${cerrar}>${I('x', 16, { sw: 2.6 })}</button></div>
+        <div className="stack" role="radiogroup" aria-labelledby="pp-t" style=${{ gap: 6 }}>${PROVS.map(function (pv) { var on = pv.id === u.prov;
+          return html`<button key=${pv.id} type="button" role="radio" aria-checked=${on} className=${'opt' + (on ? ' on' : '')} style=${{ minHeight: 52 }} onClick=${function () { if (!on) setProv(pv.id); cerrar(); }}>
+            <span className="dot" aria-hidden="true"></span><span style=${{ flex: 1, fontSize: 14, fontWeight: 700 }}>${pv.nombre}</span><span style=${{ fontSize: 11 }}>${pv.facs.length} ${pv.facs.length === 1 ? 'facultad' : 'facultades'}</span></button>`; })}</div>
+      </div>
+    </div>` : null}
+
+    ${hoja === 'foto' ? html`<div className="veil" onClick=${function (e) { if (e.target === e.currentTarget) cerrar(); }}>
+      <div className="sheet" role="dialog" aria-modal="true" aria-label="Foto de perfil">
+        <span className="sheet-t">Foto de perfil</span>
+        <div className="grid2" style=${{ gap: 10 }}>
+          <button type="button" className="btn btn-ghost" onClick=${function () { cerrar(); quitarFoto(); }}>${I('trash', 15, { sw: 2.2 })} Quitar</button>
+          <button type="button" className="btn btn-navy" onClick=${function () { cerrar(); document.getElementById('p-foto').click(); }}>${I('camera', 15, { sw: 2.2 })} Cambiar</button>
+        </div>
+      </div>
+    </div>` : null}
+  </div>`;
+}
+
+/* ---------------- SUBIR TRABAJO ---------------- */
+var MAX_FOTOS = 6, MAX_TIT = 80, MAX_DESC = 280;
+function achicarFoto(file, cb) {
+  if (!/^image\//.test(file.type)) { cb('tipo'); return; }
+  if (file.size > 20 * 1024 * 1024) { cb('peso'); return; }
+  var r = new FileReader();
+  r.onerror = function () { cb('leer'); };
+  r.onload = function () {
+    var img = new Image();
+    img.onerror = function () { cb('leer'); };
+    img.onload = function () {
+      var max = 1000, k = Math.min(1, max / Math.max(img.width, img.height));
+      var cv = document.createElement('canvas'); cv.width = Math.round(img.width * k); cv.height = Math.round(img.height * k);
+      cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+      cb(null, cv.toDataURL('image/jpeg', 0.78));
+    };
+    img.src = r.result;
+  };
+  r.readAsDataURL(file);
+}
+function subirErrors(T) {
+  var e = {};
+  if (!T.fotos.length) e.fotos = 'Subí al menos una foto del trabajo';
+  if (!T.titulo.trim()) e.titulo = 'Ponele un título a tu trabajo';
+  else if (T.titulo.length > MAX_TIT) e.titulo = 'El título es muy largo: máximo ' + MAX_TIT + ' caracteres';
+  if (T.desc.trim().length < 10) e.desc = T.desc.trim() ? 'Contá un poco más (mínimo 10 caracteres)' : 'Escribí una bajada: de qué se trata en una o dos oraciones';
+  else if (T.desc.length > MAX_DESC) e.desc = 'La bajada es muy larga: máximo ' + MAX_DESC + ' caracteres';
+  if (!T.fac) e.fac = 'Elegí la facultad';
+  if (!T.car) e.car = 'Elegí la carrera';
+  if (!T.mat) e.mat = 'Elegí la materia';
+  if (!T.cat) e.cat = 'Elegí la cátedra';
+  return e;
+}
+function SubirScreen(c) {
+  var T = c.S.subir || { fotos: [], titulo: '', desc: '', fac: '', car: '', mat: '', cat: '', touched: {}, tried: false, cargando: 0 };
+  var errs = subirErrors(T);
+  function show(k) { return (T.touched[k] || T.tried) && errs[k] ? errs[k] : ''; }
+  function set(patch, touchKey) {
+    c.up(function (p) { var cur = p.subir || T; var t = Object.assign({}, cur.touched); if (touchKey) t[touchKey] = true; return { subir: Object.assign({}, cur, patch, { touched: t }) }; });
+  }
+  var hayDatos = T.fotos.length || T.titulo || T.desc;
+  function cancelar() { if (hayDatos) c.up({ sheet: 'descartar' }); else { c.up({ subir: null }); c.back(); } }
+  function onFotos(e) {
+    var files = Array.prototype.slice.call(e.target.files || []); e.target.value = '';
+    if (!files.length) return;
+    var lugar = MAX_FOTOS - T.fotos.length;
+    if (lugar <= 0) { c.notify('Ya tenés ' + MAX_FOTOS + ' fotos, que es el máximo. Quitá alguna para sumar otra.', null, true); return; }
+    var sobran = files.length - lugar; files = files.slice(0, lugar);
+    set({ cargando: files.length });
+    var malos = 0;
+    files.forEach(function (f) {
+      achicarFoto(f, function (err, data) {
+        c.up(function (p) {
+          var cur = p.subir; if (!cur) return {};
+          var fotos = err ? cur.fotos : cur.fotos.concat([data]);
+          return { subir: Object.assign({}, cur, { fotos: fotos, cargando: Math.max(0, cur.cargando - 1), touched: Object.assign({}, cur.touched, { fotos: true }) }) };
+        });
+        if (err) { malos++; c.notify(err === 'tipo' ? f.name + ' no es una imagen. Usá JPG o PNG.' : err === 'peso' ? f.name + ' pesa más de 20 MB.' : 'No pudimos abrir ' + f.name + '. Probá con otra.', null, true); }
+      });
+    });
+    if (sobran > 0) setTimeout(function () { c.notify('Agregamos ' + lugar + (lugar === 1 ? ' foto' : ' fotos') + '. El máximo es ' + MAX_FOTOS + '.', null, true); }, 400);
+  }
+  function quitarFoto(i) {
+    var antes = T.fotos.slice(); var f = T.fotos.slice(); f.splice(i, 1); set({ fotos: f });
+    c.notify('Quitaste una foto', function () { set({ fotos: antes }); });
+  }
+  function portada(i) { if (i === 0) return; var f = T.fotos.slice(); var x = f.splice(i, 1)[0]; f.unshift(x); set({ fotos: f }); c.notify('Esa foto ahora es la portada'); }
+  function publicar() {
+    if (Object.keys(errs).length || T.cargando) {
+      set({ tried: true });
+      c.notify(T.cargando ? 'Esperá a que terminen de cargar las fotos' : 'Faltan datos: revisá los campos marcados', null, true);
+      return;
+    }
+    var u = c.user, x = carreraDe(T.fac, T.car);
+    var post = { id: 'u' + Date.now(), autorEmail: c.S.email, autor: (u.nombre + ' ' + (u.apellido || '')).trim(), fac: T.fac, carrera: x.nombre, ck: x.k, sigla: x.sigla,
+      titulo: T.titulo.trim(), desc: T.desc.trim(), materia: T.mat, catedra: T.cat, fotos: T.fotos.slice(), likes: 0, fecha: Date.now() };
+    if (!c.addPost(post)) { c.notify('No hay más espacio en este navegador. Probá con menos fotos o eliminá algún trabajo tuyo.', null, true); return; }
+    c.up({ subir: null, stack: [], tab: 'inicio', feed: { fac: 'todas', car: 'todas', q: '', buscando: false } });
+    c.notify('¡Tu trabajo se publicó en Inicio!', function () { c.removePost(post.id); });
+  }
+  var fac = T.fac ? facById(T.fac) : null;
+  var mats = T.fac && T.car ? materiasDe(T.fac, T.car) : [];
+  var catOpts = T.fac && T.mat ? catedrasDe(T.fac, T.mat, T.car) : CATEDRAS;
+  var listo = !Object.keys(errs).length && !T.cargando;
+  return html`<div className="screen">
+    <div className="hdr" style=${{ paddingBottom: 18 }}>
+      <div className="halftone deco" aria-hidden="true" style=${{ top: -24, right: 40, width: 90, height: 90, borderRadius: '50%', opacity: .5 }}></div>
+      <div className="row" style=${{ justifyContent: 'space-between' }}>
+        <button type="button" className="icon-btn plain" style=${{ color: '#d66fa9', marginLeft: -10 }} aria-label="Cancelar y volver" onClick=${cancelar}>${I('x', 18, { sw: 2.6 })}</button>
+        <span className="label">Nuevo trabajo</span>
+      </div>
+      <h1 style=${{ fontSize: 28 }}>SUBÍ TU TRABAJO</h1>
+      <p>Mostrá qué se hace en tu cursada. Lo van a ver estudiantes que están eligiendo carrera.</p>
+    </div>
+    <div className="scroll">
+      <form noValidate className="pad stack" style=${{ gap: 20 }} onSubmit=${function (e) { e.preventDefault(); publicar(); }}>
+
+        <div className="field">
+          <div className="row" style=${{ justifyContent: 'space-between' }}><span className="label" id="s-fotos-l">Fotos *</span><span className="hint" aria-live="polite">${T.fotos.length} de ${MAX_FOTOS}${T.cargando ? ' · cargando ' + T.cargando + '…' : ''}</span></div>
+          <div className=${'thumbs' + (show('fotos') ? ' err' : '')}>
+            ${T.fotos.map(function (src, i) { return html`<div key=${i} className="thumb">
+              <img src=${src} alt=${'Foto ' + (i + 1)} />
+              ${i === 0 ? html`<span className="portada">PORTADA</span>` : html`<button type="button" className="mkcover" onClick=${function () { portada(i); }}>Hacer portada</button>`}
+              <button type="button" className="rm" aria-label=${'Quitar foto ' + (i + 1)} onClick=${function () { quitarFoto(i); }}>${I('x', 12, { sw: 3 })}</button>
+            </div>`; })}
+            ${T.cargando ? html`<div className="thumb loading" aria-hidden="true"><span>Cargando…</span></div>` : null}
+            ${T.fotos.length < MAX_FOTOS ? html`<label className="thumb add" htmlFor="s-fotos">
+              ${I('image', 26, { sw: 1.8 })}<span>${T.fotos.length ? 'Agregar más' : 'Elegir fotos'}</span>
+              <input id="s-fotos" className="sr" type="file" accept="image/*" multiple aria-labelledby="s-fotos-l" onChange=${onFotos} />
+            </label>` : null}
+          </div>
+          ${show('fotos') ? Msg(show('fotos')) : html`<span className="hint">Hasta ${MAX_FOTOS} fotos. La primera es la portada. Podés elegir varias a la vez.</span>`}
+        </div>
+
+        <div className="field">
+          <div className="row" style=${{ justifyContent: 'space-between' }}><label htmlFor="s-tit">Título *</label><span className=${'hint' + (T.titulo.length > MAX_TIT ? ' msg err' : '')}>${T.titulo.length}/${MAX_TIT}</span></div>
+          <input id="s-tit" className=${'input' + (show('titulo') ? ' err' : '')} placeholder="Ej: Afiche para un festival de cine" value=${T.titulo} aria-invalid=${!!show('titulo')}
+            onChange=${function (e) { set({ titulo: e.target.value }); }} onBlur=${function () { set({}, 'titulo'); }} />
+          ${Msg(show('titulo'))}
+        </div>
+        <div className="field">
+          <div className="row" style=${{ justifyContent: 'space-between' }}><label htmlFor="s-desc">Bajada *</label><span className=${'hint' + (T.desc.length > MAX_DESC ? ' msg err' : '')}>${T.desc.length}/${MAX_DESC}</span></div>
+          <textarea id="s-desc" className=${'input area' + (show('desc') ? ' err' : '')} rows="4" placeholder="De qué se trata, cuál era la consigna o qué te gustó resolver." value=${T.desc} aria-invalid=${!!show('desc')}
+            onChange=${function (e) { set({ desc: e.target.value }); }} onBlur=${function () { set({}, 'desc'); }}></textarea>
+          ${Msg(show('desc'))}
+        </div>
+
+        <div className="stack dashed-top" style=${{ gap: 14, paddingTop: 18 }}>
+          <span className="label">¿De dónde es el trabajo?</span>
+          <div className="field"><label htmlFor="s-fac">Facultad *</label>
+            <select id="s-fac" className=${'input' + (show('fac') ? ' err' : '')} value=${T.fac} onChange=${function (e) { set({ fac: e.target.value, car: '', mat: '' }, 'fac'); }}>
+              <option value="" disabled>Elegí la facultad</option>
+              ${FACS.map(function (f) { return html`<option key=${f.id} value=${f.id}>${f.sigla} · ${f.uni}</option>`; })}
+            </select>${Msg(show('fac'))}</div>
+          <div className="field"><label htmlFor="s-car">Carrera *</label>
+            <select id="s-car" className=${'input' + (show('car') ? ' err' : '')} disabled=${!fac} value=${T.car} onChange=${function (e) { set({ car: e.target.value, mat: '' }, 'car'); }}>
+              <option value="" disabled>${fac ? 'Elegí la carrera' : 'Primero elegí la facultad'}</option>
+              ${(fac ? fac.carreras : []).map(function (x) { return html`<option key=${x.sigla} value=${x.sigla}>${x.nombre}</option>`; })}
+            </select>${Msg(show('car'))}</div>
+          <div className="field"><label htmlFor="s-mat">Materia *</label>
+            <select id="s-mat" className=${'input' + (show('mat') ? ' err' : '')} disabled=${!T.car} value=${T.mat} onChange=${function (e) { set({ mat: e.target.value, cat: '' }, 'mat'); }}>
+              <option value="" disabled>${T.car ? 'Elegí la materia' : 'Primero elegí la carrera'}</option>
+              ${mats.map(function (m) { return html`<option key=${m} value=${m}>${m}</option>`; })}
+            </select>${Msg(show('mat'))}</div>
+          <div className="field" role="radiogroup" aria-labelledby="s-cat-l">
+            <span id="s-cat-l" className="label">Cátedra *</span>
+            ${catOpts.length > 4 ? html`<select className=${'input' + (show('cat') ? ' err' : '')} aria-labelledby="s-cat-l" disabled=${!T.mat} value=${T.cat} onChange=${function (e) { set({ cat: e.target.value }, 'cat'); }}>
+                <option value="" disabled>${T.mat ? 'Elegí la cátedra' : 'Primero elegí la materia'}</option>
+                ${catOpts.map(function (k) { return html`<option key=${k} value=${k}>${k}</option>`; })}
+              </select>`
+            : html`<div className="chips wrap">${catOpts.map(function (k) { var on = T.cat === k;
+              return html`<button key=${k} type="button" role="radio" aria-checked=${on} className=${'chip big' + (on ? ' on' : '')} onClick=${function () { set({ cat: k }, 'cat'); }}>${on ? I('check', 13, { sw: 3.2 }) : null}${k}</button>`; })}</div>`}
+            ${Msg(show('cat'))}
+          </div>
+        </div>
+
+        <div className="alert info">${I('info', 18)}<span>Subí solo trabajos tuyos o de tu grupo, y si hay más autores nombralos en la bajada.</span></div>
+        <div className="row" style=${{ gap: 10 }}>
+          <button type="button" className="btn btn-ghost" onClick=${cancelar}>Cancelar</button>
+          <button type="submit" className="btn btn-navy" style=${{ flex: 1, opacity: listo ? 1 : .75 }}>Publicar ${I('arrow', 16, { sw: 2.4 })}</button>
+        </div>
+      </form>
+    </div>
+  </div>`;
+}
+
+function ConfirmSheet(c, titulo, texto, cancelTxt, okTxt, onOk, onCancel) {
+  function close() { if (onCancel) onCancel(); else c.up({ sheet: null }); }
+  return html`<div className="veil" onClick=${function (e) { if (e.target === e.currentTarget) close(); }}>
+    <div className="sheet" role="alertdialog" aria-modal="true" aria-label=${titulo}>
+      <span style=${{ fontSize: 18, fontWeight: 900, textTransform: 'uppercase' }}>${titulo}</span>
+      <span className="muted">${texto}</span>
+      <div className="grid2" style=${{ gap: 10 }}>
+        <button type="button" className="btn btn-ghost" onClick=${close} autoFocus>${cancelTxt}</button>
+        <button type="button" className="btn btn-navy" onClick=${onOk}>${okTxt}</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ---------------- HOJAS ---------------- */
+function AyudaSheet(c) {
+  var colores = ['#d66fa9', '#fbce00', '#93ab6a'];
+  var pasos = [['Armá tu perfil', 'Contanos de qué provincia sos y qué te interesa. Te mostramos las facultades públicas más cercanas.'], ['Compará facultades', 'Mirá carreras, planes de estudio completos, cátedras y becas de cada una.'], ['Inspirate con trabajos reales', 'En Inicio ves lo que hacen estudiantes en cada materia. Guardá lo que te guste y lo encontrás en tu Perfil.']];
+  function close() { c.up({ sheet: null }); }
+  return html`<div className="veil" onClick=${function (e) { if (e.target === e.currentTarget) close(); }}>
+    <div className="sheet" role="dialog" aria-modal="true" aria-labelledby="ay-t">
+      <div className="row" style=${{ justifyContent: 'space-between' }}><span id="ay-t" style=${{ fontSize: 18, fontWeight: 900 }}>CÓMO FUNCIONA</span>
+        <button type="button" className="icon-btn" aria-label="Cerrar ayuda" onClick=${close}>${I('x', 16, { sw: 2.6 })}</button></div>
+      ${pasos.map(function (p, i) { return html`<div key=${i} className="row dashed-bottom" style=${{ gap: 14, alignItems: 'flex-start', paddingBottom: 14 }}>
+        <span style=${{ flexShrink: 0, width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 900, background: colores[i] }}>0${i + 1}</span>
+        <span className="stack" style=${{ gap: 3 }}><span style=${{ fontSize: 14, fontWeight: 800 }}>${p[0]}</span><span className="muted">${p[1]}</span></span>
+      </div>`; })}
+      <span className="hint">¿Querés probar sin registrarte? En la pantalla de inicio de sesión elegí una cuenta de prueba: secundaria o facultad.</span>
+      <button type="button" className="btn btn-navy btn-block" onClick=${close}>Entendido</button>
+    </div>
+  </div>`;
+}
+function LogoutSheet(c) {
+  function close() { c.up({ sheet: null }); }
+  return html`<div className="veil" onClick=${function (e) { if (e.target === e.currentTarget) close(); }}>
+    <div className="sheet" role="alertdialog" aria-modal="true" aria-labelledby="lo-t" aria-describedby="lo-d">
+      <span id="lo-t" style=${{ fontSize: 18, fontWeight: 900 }}>¿CERRAR SESIÓN?</span>
+      <span id="lo-d" className="muted">Tus guardados quedan en tu cuenta. Para volver a entrar vas a necesitar tu email y contraseña.</span>
+      <div className="grid2" style=${{ gap: 10 }}>
+        <button type="button" className="btn btn-ghost" onClick=${close} autoFocus>Cancelar</button>
+        <button type="button" className="btn btn-navy" onClick=${c.logout}>Cerrar sesión</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(h(App));
+})();
+</script>
+
+</body>
+</html>
