@@ -218,6 +218,10 @@ button.card:hover{box-shadow:6px 6px 0 var(--rosa)}
 .input.area{height:auto;min-height:110px;padding:10px 12px;line-height:1.45;resize:vertical;font-size:15px}
 .mini{display:flex;flex-direction:column;border:1px solid var(--navy);background:var(--papel);color:var(--navy);padding:0;text-align:left;overflow:hidden}
 .mini img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+.mini-img{display:block;width:100%;padding:0;border:none;background:var(--gris);cursor:zoom-in}
+.mini .mini-ed{width:36px;height:36px;min-height:36px;flex-shrink:0;color:var(--navy)}
+.mini-ed:hover{color:#8a1f55}
+.thumb-plain{width:40px;height:40px;flex-shrink:0;object-fit:cover;display:block;border:1px solid var(--navy);background:var(--gris)}
 .mini:hover{box-shadow:5px 5px 0 var(--rosa)}
 .mat.link{border:none;color:var(--navy);text-decoration:none;display:inline-flex;align-items:center;gap:4px;cursor:pointer;text-align:left;font-family:inherit}
 .mat.link:hover{outline:1px solid var(--navy)}
@@ -358,6 +362,7 @@ function I(name, size, extra) {
   size = size || 20; extra = extra || {};
   var sw = extra.sw || 2, fill = extra.fill || 'none', col = extra.color || 'currentColor';
   var p = {
+    pencil: html`<path d="M4 20 H8 L19 9 L15 5 L4 16 Z"/><path d="M13 7 L17 11"/>`,
     home: html`<path d="M3 11 L12 3 L21 11 V21 H3 Z"/><path d="M9 21 V14 H15 V21"/>`,
     fac: html`<path d="M2 9 L12 3 L22 9"/><path d="M4 9 V19 M9 9 V19 M15 9 V19 M20 9 V19"/><path d="M2 21 H22"/>`,
     user: html`<circle cx="12" cy="8" r="4"/><path d="M4 21 C4 16 8 14 12 14 C16 14 20 16 20 21"/>`,
@@ -698,7 +703,7 @@ function userToRow(u) {
 }
 function rowToPost(r) {
   return { id: r.id, autorEmail: r.autor_id, autor: r.autor || 'Estudiante', av: r.autor_avatar || null, fac: r.fac, carrera: r.carrera, ck: r.ck, sigla: r.sigla,
-    titulo: r.titulo, desc: r.bajada || '', materia: r.materia, catedra: r.catedra, fotos: r.fotos || [], likes: 0 };
+    titulo: r.titulo, desc: r.bajada || '', materia: r.materia, catedra: r.catedra, fotos: r.fotos || [], likes: 0, creado: r.creado };
 }
 function dataUrlToBlob(d) { var p = d.split(','), b = atob(p[1]), a = new Uint8Array(b.length); for (var i = 0; i < b.length; i++) a[i] = b.charCodeAt(i); return new Blob([a], { type: 'image/jpeg' }); }
 function nubeErr(e) {
@@ -721,6 +726,16 @@ var Nube = {
   guardarPerfil: function (u) { return sb.from('perfiles').upsert(userToRow(u)).then(function (r) { if (r.error) throw r.error; }); },
   cargarTrabajos: function () { return sb.from('trabajos').select('*').order('creado', { ascending: false }).limit(150).then(function (r) { if (r.error) throw r.error; return r.data.map(rowToPost); }); },
   insertarTrabajo: function (row) { return sb.from('trabajos').insert(row).select().single().then(function (r) { if (r.error) throw r.error; return r.data; }); },
+  actualizarTrabajo: function (id, row) {
+    return sb.from('trabajos').update(row).eq('id', id).select().then(function (r) {
+      if (!r.error && r.data && r.data.length) return r.data[0];
+      /* si la base no permite editar, se reemplaza la fila manteniendo el mismo id */
+      return sb.from('trabajos').delete().eq('id', id).then(function (d) {
+        if (d.error) throw d.error;
+        return sb.from('trabajos').insert(Object.assign({ id: id }, row)).select().single().then(function (x) { if (x.error) throw x.error; return x.data; });
+      });
+    });
+  },
   borrarTrabajo: function (id) { return sb.from('trabajos').delete().eq('id', id).then(function (r) { if (r.error) throw r.error; }); }
 };
 
@@ -837,6 +852,23 @@ function App() {
     if (!savePosts(list)) return false;
     up({ posts: list }); return true;
   }
+  function editPost(post, orig) {
+    if (CLOUD) {
+      return Promise.all(post.fotos.map(function (f, i) { return /^data:/.test(f) ? Nube.subirImagen(user.id, f, 'trabajo-' + i) : Promise.resolve(f); })).then(function (urls) {
+        var row = { autor_id: user.id, autor: post.autor, autor_avatar: orig.av || null, fac: post.fac, carrera: post.carrera, ck: post.ck, sigla: post.sigla,
+          titulo: post.titulo, bajada: post.desc, materia: post.materia, catedra: post.catedra, fotos: urls };
+        if (orig.creado) row.creado = orig.creado;
+        return Nube.actualizarTrabajo(orig.id, row);
+      }).then(function (r) { var np = rowToPost(r); up(function (p) { return { posts: p.posts.map(function (x) { return x.id === np.id ? np : x; }) }; }); return np; });
+    }
+    var list = S.posts.map(function (x) { return x.id === orig.id ? post : x; });
+    if (!savePosts(list)) return false;
+    up({ posts: list }); return true;
+  }
+  function openEditar(p) {
+    var car = (carreraDe(p.fac, p.sigla) || {}).sigla || p.sigla;
+    up(function (s) { return { subir: { editId: p.id, orig: p, fotos: p.fotos.slice(), titulo: p.titulo || '', desc: p.desc || '', fac: p.fac, car: car, mat: p.materia, cat: p.catedra, touched: {}, tried: false, cargando: 0 }, stack: s.stack.concat([{ type: 'subir' }]), zoom: null }; });
+  }
   function removePost(id) {
     if (CLOUD) {
       up(function (p) { return { posts: p.posts.filter(function (x) { return x.id !== id; }) }; });
@@ -904,7 +936,7 @@ function App() {
     notify('Cerraste sesión');
   }
 
-  var ctx = { cloud: CLOUD, myId: CLOUD ? (user && user.id) : S.email, nubeLogin: nubeLogin, nubeRegistro: nubeRegistro, nubeDemo: nubeDemo, subirImagen: subirImagen, cargarTrabajos: cargarTrabajos, openSubir: openSubir, allPosts: allPosts, addPost: addPost, removePost: removePost, restorePost: restorePost, S: S, up: up, sub: sub, notify: notify, user: user, updUser: updUser, toggleIn: toggleIn, isSaved: isSaved, push: push, back: back, goTab: goTab, login: login, logout: logout };
+  var ctx = { cloud: CLOUD, myId: CLOUD ? (user && user.id) : S.email, nubeLogin: nubeLogin, nubeRegistro: nubeRegistro, nubeDemo: nubeDemo, subirImagen: subirImagen, cargarTrabajos: cargarTrabajos, openSubir: openSubir, allPosts: allPosts, addPost: addPost, editPost: editPost, openEditar: openEditar, removePost: removePost, restorePost: restorePost, S: S, up: up, sub: sub, notify: notify, user: user, updUser: updUser, toggleIn: toggleIn, isSaved: isSaved, push: push, back: back, goTab: goTab, login: login, logout: logout };
 
   var body;
   if (S.screen === 'cargando') body = html`<div className="screen" style=${{ background: '#1f2449', color: '#d66fa9', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
@@ -941,7 +973,7 @@ function App() {
     ${S.sheet === 'ayuda' ? AyudaSheet(ctx) : null}
     ${S.catSheet ? CatedraSheet(ctx) : null}
     ${S.sheet === 'logout' ? LogoutSheet(ctx) : null}
-    ${S.sheet === 'descartar' ? ConfirmSheet(ctx, '¿Descartar este trabajo?', 'Se van a perder las fotos y los textos que cargaste.', 'Seguir editando', 'Descartar', function () { ctx.up({ sheet: null, subir: null }); ctx.back(); }) : null}
+    ${S.sheet === 'descartar' ? ConfirmSheet(ctx, S.subir && S.subir.editId ? '¿Descartar los cambios?' : '¿Descartar este trabajo?', S.subir && S.subir.editId ? 'Tu trabajo queda como estaba antes.' : 'Se van a perder las fotos y los textos que cargaste.', 'Seguir editando', 'Descartar', function () { ctx.up({ sheet: null, subir: null }); ctx.back(); }) : null}
     ${S.borrar ? ConfirmSheet(ctx, '¿Eliminar tu trabajo?', 'Se va a borrar de Inicio y de la materia. Vas a poder deshacerlo unos segundos.', 'Cancelar', 'Eliminar', function () {
       var post = S.posts.filter(function (x) { return x.id === S.borrar; })[0];
       ctx.up({ borrar: null }); ctx.removePost(S.borrar);
@@ -1306,7 +1338,8 @@ function PostCard(c, p) {
         <button type="button" className=${'act' + (saved ? ' saved' : '')} aria-pressed=${saved} aria-label=${saved ? 'Quitar de guardados' : 'Guardar trabajo'} onClick=${function () {
           c.toggleIn('posts', p.id, ['Guardado en tu perfil', 'Quitaste el trabajo de tus guardados']);
         }}>${I('bookmark', 20, { sw: 1.8, fill: saved ? '#1f2449' : 'none' })}${saved ? 'Guardado' : 'Guardar'}</button>
-        ${mio ? html`<button type="button" className="act" style=${{ marginLeft: 'auto', color: '#8a1f55' }} onClick=${function () { c.up({ borrar: p.id }); }}>${I('trash', 18, { sw: 1.9 })}Eliminar</button>` : null}
+        ${mio ? html`<button type="button" className="act" style=${{ marginLeft: 'auto' }} onClick=${function () { c.openEditar(p); }}>${I('pencil', 18, { sw: 1.9 })}Editar</button>` : null}
+        ${mio ? html`<button type="button" className="act" style=${{ color: '#8a1f55' }} onClick=${function () { c.up({ borrar: p.id }); }}>${I('trash', 18, { sw: 1.9 })}Eliminar</button>` : null}
       </div>
     </div>
   </article>`;
@@ -1960,10 +1993,11 @@ function PerfilScreen(c) {
             <span className="set-ic" aria-hidden="true">${I('plus', 18, { sw: 2.6 })}</span>
             <span style=${{ flex: 1, textAlign: 'left' }}>${u.nivel === 'facultad' ? 'Subí tu primera entrega para que otros vean qué se hace en tu cursada.' : 'Subí algo que hayas diseñado, en la escuela o por tu cuenta.'}</span>
           </button>`
-        : html`<div className="mini-strip">${misPosts.map(function (p) { return html`<button key=${p.id} type="button" className="mini" onClick=${function () { c.up({ zoom: { tiles: p.fotos.map(function (x, j) { return { img: x, titulo: p.titulo, tp: 'Foto ' + (j + 1) + ' de ' + p.fotos.length }; }), i: 0 } }); }}>
-            <img src=${p.fotos[0]} alt="" />
-            <span className="stack" style=${{ gap: 2, padding: '6px 8px' }}><span style=${{ fontSize: 11, fontWeight: 800, lineHeight: 1.2 }}>${p.titulo}</span></span>
-          </button>`; })}</div>`}
+        : html`<div className="mini-strip">${misPosts.map(function (p) { return html`<div key=${p.id} className="mini">
+            <button type="button" className="mini-img" aria-label=${'Ver fotos de ' + p.titulo} onClick=${function () { c.up({ zoom: { tiles: p.fotos.map(function (x, j) { return { img: x, titulo: p.titulo, tp: 'Foto ' + (j + 1) + ' de ' + p.fotos.length }; }), i: 0 } }); }}><img src=${p.fotos[0]} alt="" /></button>
+            <span className="row" style=${{ gap: 2, padding: '0 0 0 8px', alignItems: 'center' }}><span style=${{ flex: 1, minWidth: 0, fontSize: 11, fontWeight: 800, lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>${p.titulo}</span>
+              <button type="button" className="icon-btn plain mini-ed" aria-label=${'Editar ' + p.titulo} onClick=${function () { c.openEditar(p); }}>${I('pencil', 15, { sw: 2.1 })}</button></span>
+          </div>`; })}</div>`}
       </section>
 
       <section className="p-sec" aria-labelledby="t-guardados">
@@ -1973,7 +2007,8 @@ function PerfilScreen(c) {
         </div>
         ${items.length === 0 ? html`<p className="p-none">${emptyTxt[1]} <button type="button" className="btn-link" style=${{ padding: 0, minHeight: 0 }} onClick=${function () { c.goTab(emptyTxt[2]); }}>${emptyTxt[3]}</button></p>`
         : html`<div className="stack" style=${{ gap: 6 }}>${items.map(function (it) { return html`<button key=${it.k} type="button" className="list-item sm" onClick=${it.go}>
-          ${it.img ? html`<span className="duo" style=${{ width: 40, height: 40, flexShrink: 0, background: it.color.bg }}><img src=${it.img} alt="" /></span>`
+          ${it.img && it.kind === 'post' ? html`<img className="thumb-plain" src=${it.img} alt="" loading="lazy" />`
+            : it.img ? html`<span className="duo" style=${{ width: 40, height: 40, flexShrink: 0, background: it.color.bg }}><img src=${it.img} alt="" /></span>`
             : html`<span aria-hidden="true" style=${{ width: 40, height: 40, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: it.color.bg, color: it.color.fg, fontWeight: 900, fontSize: 14 }}>${it.mark}</span>`}
           <span className="stack" style=${{ flex: 1, minWidth: 0, gap: 1 }}><span style=${{ fontSize: 13, fontWeight: 800, lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>${it.t}</span><span style=${{ fontSize: 11 }}>${it.s}</span></span>
           ${I('chevr', 14, { sw: 2.4 })}
@@ -2113,7 +2148,8 @@ function SubirScreen(c) {
   function set(patch, touchKey) {
     c.up(function (p) { var cur = p.subir || T; var t = Object.assign({}, cur.touched); if (touchKey) t[touchKey] = true; return { subir: Object.assign({}, cur, patch, { touched: t }) }; });
   }
-  var hayDatos = T.fotos.length || T.titulo || T.desc;
+  var edit = !!T.editId, O = T.orig || {};
+  var hayDatos = edit ? (T.titulo !== O.titulo || T.desc !== (O.desc || '') || T.fac !== O.fac || T.mat !== O.materia || T.cat !== O.catedra || T.fotos.join('|') !== (O.fotos || []).join('|')) : (T.fotos.length || T.titulo || T.desc);
   function cancelar() { if (hayDatos) c.up({ sheet: 'descartar' }); else { c.up({ subir: null }); c.back(); } }
   function onFotos(e) {
     var files = Array.prototype.slice.call(e.target.files || []); e.target.value = '';
@@ -2148,8 +2184,20 @@ function SubirScreen(c) {
     }
     var u = c.user, x = carreraDe(T.fac, T.car);
     if (T.publicando) return;
-    var post = { id: 'u' + Date.now(), autorEmail: c.myId, autor: (u.nombre + ' ' + (u.apellido || '')).trim(), fac: T.fac, carrera: x.nombre, ck: x.k, sigla: x.sigla,
-      titulo: T.titulo.trim(), desc: T.desc.trim(), materia: T.mat, catedra: T.cat, fotos: T.fotos.slice(), likes: 0, fecha: Date.now() };
+    var post = { id: edit ? O.id : 'u' + Date.now(), autorEmail: c.myId, autor: (u.nombre + ' ' + (u.apellido || '')).trim(), fac: T.fac, carrera: x.nombre, ck: x.k, sigla: x.sigla,
+      titulo: T.titulo.trim(), desc: T.desc.trim(), materia: T.mat, catedra: T.cat, fotos: T.fotos.slice(), likes: edit ? (O.likes || 0) : 0, fecha: edit ? (O.fecha || Date.now()) : Date.now() };
+    if (edit) {
+      if (O.av) post.av = O.av;
+      if (!hayDatos) { c.up({ subir: null }); c.back(); c.notify('No había cambios para guardar'); return; }
+      var hecho = function () { c.up({ subir: null }); c.back(); c.notify('Guardaste los cambios de ' + post.titulo, c.cloud ? null : function () { c.editPost(O, post); }); };
+      if (c.cloud) {
+        set({ publicando: true });
+        c.editPost(post, O).then(hecho).catch(function (err) { set({ publicando: false }); c.notify('No se pudieron guardar los cambios. ' + nubeErr(err), null, true); });
+        return;
+      }
+      if (!c.editPost(post, O)) { c.notify('No hay más espacio en este navegador. Probá con menos fotos.', null, true); return; }
+      hecho(); return;
+    }
     function listo(pub) {
       c.up({ subir: null, stack: [], tab: 'inicio', feed: { fac: 'todas', car: 'todas', q: '', buscando: false } });
       c.notify('¡Tu trabajo se publicó en Inicio!', function () { c.removePost(pub.id); });
@@ -2171,10 +2219,10 @@ function SubirScreen(c) {
       <div className="halftone deco" aria-hidden="true" style=${{ top: -24, right: 40, width: 90, height: 90, borderRadius: '50%', opacity: .5 }}></div>
       <div className="row" style=${{ justifyContent: 'space-between' }}>
         <button type="button" className="icon-btn plain" style=${{ color: '#d66fa9', marginLeft: -10 }} aria-label="Cancelar y volver" onClick=${cancelar}>${I('x', 18, { sw: 2.6 })}</button>
-        <span className="label">Nuevo trabajo</span>
+        <span className="label">${edit ? 'Editar trabajo' : 'Nuevo trabajo'}</span>
       </div>
-      <h1 style=${{ fontSize: 28 }}>SUBÍ TU TRABAJO</h1>
-      <p>Mostrá qué se hace en tu cursada. Lo van a ver estudiantes que están eligiendo carrera.</p>
+      <h1 style=${{ fontSize: 28 }}>${edit ? 'EDITÁ TU TRABAJO' : 'SUBÍ TU TRABAJO'}</h1>
+      <p>${edit ? 'Cambiá la portada, sumá o quitá fotos y corregí los textos.' : 'Mostrá qué se hace en tu cursada. Lo van a ver estudiantes que están eligiendo carrera.'}</p>
     </div>
     <div className="scroll">
       <form noValidate className="pad stack" style=${{ gap: 20 }} onSubmit=${function (e) { e.preventDefault(); publicar(); }}>
@@ -2241,7 +2289,7 @@ function SubirScreen(c) {
         <div className="alert info">${I('info', 18)}<span>Subí solo trabajos tuyos o de tu grupo, y si hay más autores nombralos en la bajada.</span></div>
         <div className="row" style=${{ gap: 10 }}>
           <button type="button" className="btn btn-ghost" onClick=${cancelar}>Cancelar</button>
-          <button type="submit" className="btn btn-navy" disabled=${!!T.publicando} style=${{ flex: 1, opacity: listo ? 1 : .75 }}>${T.publicando ? 'Publicando…' : 'Publicar'} ${I('arrow', 16, { sw: 2.4 })}</button>
+          <button type="submit" className="btn btn-navy" disabled=${!!T.publicando} style=${{ flex: 1, opacity: listo ? 1 : .75 }}>${T.publicando ? (edit ? 'Guardando…' : 'Publicando…') : (edit ? 'Guardar cambios' : 'Publicar')} ${I('arrow', 16, { sw: 2.4 })}</button>
         </div>
       </form>
     </div>
