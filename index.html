@@ -430,7 +430,7 @@ var B = {
   manifiesto: { tipo: 'CAMPAÑA', nombre: 'Beca Manifiesto Juvenil', desc: 'Estipendio económico mensual para manutención + tutoría académica de nivelación durante el primer año.' },
   codigo: { tipo: 'CAMPAÑA', nombre: 'Beca Código Visual', desc: 'Beca para carreras o tecnicaturas de diseño digital + licencias de software profesional + mentoría 1 a 1.' },
   materiaViva: { tipo: 'CAMPAÑA', nombre: 'Beca Materia Viva Buenos Aires', desc: 'Financiamiento total de la carrera + acceso a FabLabs y laboratorios de prototipado 3D + asignación para materiales.' },
-  proyectar: { tipo: 'CAMPAÑA', nombre: 'Beca Proyectar Córdoba', desc: '100% de la matrícula en Arquitectura + pasantía garantizada en EDISUR.' }
+  proyectar: { tipo: 'CAMPAÑA', nombre: 'Beca Proyectar Córdoba', desc: '100% de la matrícula en Arquitectura + pasantía garantizada en DISUR.' }
 };
 function uniBeca(u) { return { tipo: u, nombre: 'Becas de la ' + u, desc: 'Ayudas económicas propias de la universidad. Requisitos y fechas en su sitio oficial.' }; }
 
@@ -1071,7 +1071,7 @@ function LoginScreen(c) {
         </div>
 
         <footer className="login-foot">
-          <span>Ministerio de Educación<br />× Grupo EDISUR</span>
+          <span>Ministerio de Educación<br />× Grupo DISUR</span>
           <span style=${{ textAlign: 'right' }}>Una campaña de<br /><strong>Tinta Brava</strong></span>
         </footer>
       </div>
@@ -1416,7 +1416,7 @@ function AvisoBecas(c) {
     <div className="grid-rosa" aria-hidden="true" style=${{ position: 'absolute', inset: 0, opacity: .7 }}></div>
     <span style=${{ position: 'relative' }}>${Asterisco(22, '#d66fa9', 3)}</span>
     <span style=${{ position: 'relative', fontSize: 18, fontWeight: 800, lineHeight: 1.1 }}>INSCRIBITE AL PROGRAMA DE BECAS 2027</span>
-    <span style=${{ position: 'relative', fontSize: 12, color: '#fff' }}>Gobierno de la Ciudad × EDISUR</span>
+    <span style=${{ position: 'relative', fontSize: 12, color: '#fff' }}>Gobierno de la Ciudad × DISUR</span>
     <button type="button" className=${'btn ' + (on ? 'btn-rosa' : 'btn-ghost on-dark')} style=${{ position: 'relative', alignSelf: 'flex-start', fontSize: 12 }} aria-pressed=${on} onClick=${function () {
       c.up({ aviso: !on });
       c.notify(on ? 'Cancelaste el aviso de becas' : 'Listo, te avisamos cuando abra la inscripción', on ? null : function () { c.up({ aviso: false }); });
@@ -2036,7 +2036,7 @@ function PerfilScreen(c) {
             <span className="set-ic" aria-hidden="true">${I('logout', 18, { sw: 2 })}</span><span className="set-t" style=${{ flex: 1, textAlign: 'left' }}>Cerrar sesión</span>
           </button>
         </div>
-        <span className="hint">Prototipo de Tinta Brava para Ministerio de Educación × Grupo EDISUR. ${c.cloud ? 'Tu cuenta se guarda en la nube: podés entrar desde cualquier celular.' : 'Tus datos se guardan solo en este navegador.'}</span>
+        <span className="hint">Prototipo de Tinta Brava para Ministerio de Educación × Grupo DISUR. ${c.cloud ? 'Tu cuenta se guarda en la nube: podés entrar desde cualquier celular.' : 'Tus datos se guardan solo en este navegador.'}</span>
       </section>
     </div>
 
