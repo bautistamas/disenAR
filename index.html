@@ -279,6 +279,35 @@ button.mat-head:active{transform:none}
 .help-pill:hover{background:rgba(214,111,169,.12)}
 .login-foot{margin-top:auto;padding-top:14px;border-top:1px dashed rgba(214,111,169,.7);display:grid;grid-template-columns:1fr 1fr;gap:16px;font-size:9px;line-height:1.55;letter-spacing:.07em;text-transform:uppercase;font-weight:500}
 .login-foot strong{font-weight:800}
+/* portada del ingreso: collage de trabajos en movimiento */
+.cover{position:relative;flex:1 0 auto;display:flex;flex-direction:column;background:var(--navy);color:var(--rosa);overflow:hidden}
+.cover-top{position:relative;z-index:3;display:flex;justify-content:space-between;align-items:center;padding:14px 22px 0}
+.cover-stage{position:relative;flex:1;min-height:170px;display:flex;flex-direction:column}
+.fac-frame{position:relative;z-index:2;flex:1;margin:14px 30px 0 22px;border:2px solid var(--rosa);box-shadow:8px 8px 0 var(--rosa);background:var(--navy);overflow:hidden}
+.fslide{position:absolute;inset:0;opacity:0;animation-timing-function:linear;animation-iteration-count:infinite}
+.fslide:first-child{opacity:1}
+@media (prefers-reduced-motion:reduce){.fslide:first-child{opacity:1!important}.fslide:first-child .fac-chip{transform:none!important}}
+.fslide .duo{position:absolute;inset:0}
+.fslide .duo img{transform-origin:50% 60%}
+.fac-chip{position:absolute;z-index:3;left:12px;bottom:12px;background:var(--navy);padding:8px 10px 7px;display:flex;flex-direction:column;gap:2px}
+.fac-chip b{font-size:22px;line-height:1;font-weight:900;color:var(--rosa);letter-spacing:-.01em}
+.fac-chip span{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#fff}
+.fac-num{position:absolute;z-index:3;right:10px;top:10px;font-size:10px;font-weight:800;letter-spacing:.1em;color:var(--navy);background:var(--amarillo);padding:3px 6px}
+.cover-circ{position:absolute;z-index:1;right:-34px;top:-6px;width:96px;height:96px;border-radius:50%;background-image:radial-gradient(var(--rosa) 1.1px,transparent 1.7px);background-size:6px 6px;pointer-events:none}
+.cover-ast{position:absolute;z-index:4;left:4px;top:-2px;animation:spin 14s linear infinite;pointer-events:none;line-height:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.cover-chev{position:absolute;z-index:4;right:22px;bottom:-16px;display:flex;gap:2px;pointer-events:none}
+.cover-chev svg{animation:wave 1.8s ease-in-out infinite}
+.cover-chev svg:nth-child(2){animation-delay:.15s}.cover-chev svg:nth-child(3){animation-delay:.3s}
+@keyframes wave{0%,60%,100%{transform:none}30%{transform:translateX(6px)}}
+.cover-title{position:relative;z-index:3;padding:24px 22px 18px}
+.cover-title h1{margin:0;font-size:40px;line-height:.92;font-weight:900;letter-spacing:-.015em;color:var(--rosa)}
+.cover-title p{margin:8px 0 0;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#fff}
+.login-panel{position:relative;background:var(--navy);color:var(--rosa);display:flex;flex-direction:column;padding:18px 26px 18px;border-top:2px dashed var(--rosa)}
+.login-panel form{gap:10px!important}
+.login-panel .field{gap:4px}
+.login-panel .login-foot{margin-top:16px!important;padding-top:10px}
+@media (max-height:780px){.cover-title{padding:16px 22px 12px}.cover-title h1{font-size:34px}.cover-stage{min-height:140px}.fac-frame{margin-top:10px}}
 .icon-btn.bm:hover{background:rgba(31,36,73,.08)}
 .fbar{position:sticky;top:0;z-index:3;background:var(--papel);border-bottom:1px dashed var(--navy);padding:10px 22px;display:flex;align-items:center;gap:10px}
 .fbtn{flex-shrink:0;min-height:40px;padding:0 12px;display:inline-flex;align-items:center;gap:7px;background:var(--papel);color:var(--navy);border:1px solid var(--navy);font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase}
@@ -1019,24 +1048,10 @@ function LoginScreen(c) {
   }
   return html`<div className="screen" style=${{ background: '#1f2449', color: '#d66fa9' }}>
     <div className="scroll">
-      <div style=${{ position: 'relative', minHeight: '100%', display: 'flex', flexDirection: 'column', padding: '14px 26px 28px' }}>
-        <div aria-hidden="true" style=${{ position: 'absolute', top: 0, bottom: 0, left: 14, borderLeft: '1px dashed rgba(214,111,169,.7)' }}></div>
-        <div aria-hidden="true" style=${{ position: 'absolute', top: 0, bottom: 0, right: 14, borderLeft: '1px dashed rgba(214,111,169,.7)' }}></div>
-        <div className="row" style=${{ justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style=${{ fontSize: 9, letterSpacing: '.06em', fontWeight: 500 }}>/ESTUDIÁ DISEÑO</span>
-          <button type="button" className="help-pill" onClick=${function () { c.up({ sheet: 'ayuda' }); }}>${I('help', 14, { sw: 2.2 })} Cómo funciona</button>
-        </div>
-        <div aria-hidden="true" style=${{ position: 'relative', height: 150, marginTop: 16 }}>
-          <div className="halftone" style=${{ position: 'absolute', top: 0, left: 0, width: 110, height: 100, opacity: .8 }}></div>
-          <div className="halftone" style=${{ position: 'absolute', top: 30, left: 56, width: 110, height: 110, borderRadius: '50%', opacity: .7 }}></div>
-          <div style=${{ position: 'absolute', top: 70, right: 30, width: 70, height: 40, background: '#93ab6a', opacity: .6 }}></div>
-          <div className="grid-rosa" style=${{ position: 'absolute', top: 10, right: 0, width: 120, height: 90 }}></div>
-        </div>
-        <div className="row" style=${{ gap: 12, marginTop: 8 }}>${Asterisco(34, '#d66fa9', 2.4)}</div>
-        <h1 style=${{ margin: '12px 0 0', fontSize: 44, lineHeight: .96, fontWeight: 800, letterSpacing: '-.01em' }}>DISEÑA LO QUE VIENE</h1>
-        <p style=${{ margin: '10px 0 0', fontSize: 13, letterSpacing: '.04em', textTransform: 'uppercase' }}>El futuro no se dibuja, se proyecta</p>
-
-        <form noValidate onSubmit=${submit} style=${{ marginTop: 26, display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <div style=${{ position: 'relative', minHeight: '100%', display: 'flex', flexDirection: 'column' }}>
+        ${Portada(c)}
+        <div className="login-panel">
+        <form noValidate onSubmit=${submit} style=${{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <span className="label" style=${{ color: '#fff' }}>Iniciá sesión</span>
           ${L.error === 'noexiste' ? html`<div className="alert info fade-in" role="alert">${I('info', 18)}<span style=${{ flex: 1 }}><strong>No hay una cuenta con ese email.</strong> ¿Es tu primera vez? Creá tu perfil en 3 pasos.
             <br /><button type="button" className="btn-link" style=${{ paddingLeft: 0 }} onClick=${crear}>Crear cuenta con este email</button></span></div>` : null}
@@ -1070,13 +1085,50 @@ function LoginScreen(c) {
           </div>
         </div>
 
-        <footer className="login-foot">
+        <footer className="login-foot" style=${{ marginTop: 22 }}>
           <span>Ministerio de Educación<br />× Grupo DISUR</span>
           <span style=${{ textAlign: 'right' }}>Una campaña de<br /><strong>Tinta Brava</strong></span>
         </footer>
+        </div>
       </div>
     </div>
   </div>`;
+}
+
+/* ---------- Portada del ingreso: facultades públicas que van cambiando ---------- */
+function Portada(c) {
+  var L = FACS.length, D = 4.5, T = L * D, w = 100 / L, fi = w * .18, fo = w + w * .18;
+  // cada foto: entra con fundido, hace un zoom lento y sale cruzándose con la siguiente
+  var css = '@keyframes fslide{0%{opacity:0}' + fi.toFixed(2) + '%{opacity:1}' + w.toFixed(2) + '%{opacity:1}' + fo.toFixed(2) + '%{opacity:0}100%{opacity:0}}' +
+    '@keyframes fzoom{0%{transform:scale(1.16) translateX(-2%)}' + fo.toFixed(2) + '%{transform:scale(1) translateX(1.5%)}100%{transform:scale(1) translateX(1.5%)}}' +
+    '@keyframes fchip{0%{transform:translateY(130%)}' + (fi * 1.6).toFixed(2) + '%{transform:none}' + w.toFixed(2) + '%{transform:none}' + (w + 3).toFixed(2) + '%{transform:translateY(130%)}100%{transform:translateY(130%)}}';
+  var chev = html`<svg width="18" height="28" viewBox="0 0 22 34" fill="none" stroke="#93ab6a" stroke-width="4"><path d="M3 3 L18 17 L3 31"/></svg>`;
+  return html`<section className="cover" aria-label="Facultades públicas donde estudiar diseño">
+    <style>${css}</style>
+    <div className="cover-top">
+      <span style=${{ fontSize: 10, letterSpacing: '.08em', fontWeight: 700 }}>/ESTUDIÁ DISEÑO</span>
+      <button type="button" className="help-pill" onClick=${function () { c.up({ sheet: 'ayuda' }); }}>${I('help', 14, { sw: 2.2 })} Cómo funciona</button>
+    </div>
+    <div className="cover-stage">
+      <div className="cover-circ" aria-hidden="true"></div>
+      <span className="cover-ast" aria-hidden="true">${Asterisco(40, '#fbce00', 3)}</span>
+      <div className="fac-frame" aria-hidden="true">
+        ${FACS.map(function (f, i) {
+          var t = i * D;
+          return html`<div key=${f.id} className="fslide" style=${{ animation: 'fslide ' + T + 's linear ' + t + 's infinite' + (i ? ' backwards' : '') }}>
+            <div className="duo" style=${{ background: f.color }}><img src=${f.img} alt="" style=${{ animation: 'fzoom ' + T + 's linear ' + t + 's infinite' }} /></div>
+            <div className="fac-chip" style=${{ animation: 'fchip ' + T + 's ease-out ' + t + 's infinite' }}><b>${f.sigla}</b><span>${f.uni} · ${f.ciudad}</span></div>
+            <span className="fac-num">${(i < 9 ? '0' : '') + (i + 1)} / ${(L < 10 ? '0' : '') + L}</span>
+          </div>`;
+        })}
+      </div>
+      <div className="cover-chev" aria-hidden="true">${chev}${chev}${chev}</div>
+    </div>
+    <div className="cover-title">
+      <h1>DISEÑA LO<br />QUE VIENE</h1>
+      <p>Elegí un futuro de diseño</p>
+    </div>
+  </section>`;
 }
 
 /* ---------------- REGISTRO (3 pasos) ---------------- */
